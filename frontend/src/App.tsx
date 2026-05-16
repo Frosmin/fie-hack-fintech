@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Navbar, type AppView } from "./components/layout/Navbar";
 import { AuthPage } from "./features/auth/AuthPage";
 import { Calculator } from "./features/calculator/Calculator";
@@ -14,7 +14,7 @@ interface AuthUser {
   role: string;
 }
 
-const views: Record<AppView, JSX.Element> = {
+const views: Record<AppView, React.ReactNode> = {
   dashboard: <Dashboard />,
   sales: <Sales />,
   calculator: <Calculator />,
