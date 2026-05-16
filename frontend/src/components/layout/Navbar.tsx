@@ -1,6 +1,6 @@
 import { useState } from "react";
 import "./Navbar.css";
-import brandIcon from "../../assets/icon.webp";
+import brandIcon from "../../assets/logo-tinka.webp";
 
 export type AppView = "dashboard" | "sales" | "chatbot";
 
