@@ -2,7 +2,7 @@ import { useState } from "react";
 import "./Navbar.css";
 import brandIcon from "../../assets/icon.webp";
 
-export type AppView = "dashboard" | "sales" | "chatbot";
+export type AppView = "dashboard" | "sales" | "calculator" | "chatbot";
 
 const navigation = [
   {
@@ -12,6 +12,10 @@ const navigation = [
   {
     id: "sales",
     label: "Registro ventas",
+  },
+  {
+    id: "calculator",
+    label: "Calculadora IA",
   },
   {
     id: "chatbot",

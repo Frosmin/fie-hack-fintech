@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Navbar, type AppView } from "./components/layout/Navbar";
 import { AuthPage } from "./features/auth/AuthPage";
+import { Calculator } from "./features/calculator/Calculator";
 import { Chatbot } from "./features/chatbot/Chatbot";
 import { Dashboard } from "./features/dashboard/Dashboard";
 import { Sales } from "./features/sales/Sales";
@@ -16,6 +17,7 @@ interface AuthUser {
 const views: Record<AppView, JSX.Element> = {
   dashboard: <Dashboard />,
   sales: <Sales />,
+  calculator: <Calculator />,
   chatbot: <Chatbot />,
 };
 
