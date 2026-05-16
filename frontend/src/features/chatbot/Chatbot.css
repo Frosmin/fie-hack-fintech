@@ -24,7 +24,7 @@
   max-width: 84%;
   padding: 14px 16px;
   border-radius: 20px;
-  border: 1px solid rgba(148, 163, 184, 0.1);
+  border: 1px solid #dbe2f0;
 }
 
 .chat-message strong {
@@ -38,7 +38,7 @@
 }
 
 .chat-message--assistant {
-  background: rgba(15, 27, 45, 0.7);
+  background: #f7f9ff;
   border-top-left-radius: 6px;
 }
 
@@ -46,8 +46,8 @@
   margin-left: auto;
   background: linear-gradient(
     145deg,
-    rgba(18, 184, 134, 0.18),
-    rgba(255, 184, 107, 0.1)
+    rgba(68, 194, 244, 0.2),
+    rgba(238, 0, 138, 0.14)
   );
   border-top-right-radius: 6px;
 }
@@ -60,9 +60,9 @@
 
 .chat-panel__composer input {
   width: 100%;
-  border: 1px solid rgba(148, 163, 184, 0.16);
+  border: 1px solid #d2dced;
   border-radius: 18px;
-  background: rgba(15, 27, 45, 0.7);
+  background: #ffffff;
   color: var(--text-strong);
   padding: 14px 16px;
   outline: none;
@@ -73,8 +73,8 @@
 }
 
 .chat-panel__composer input:focus {
-  border-color: rgba(100, 241, 181, 0.5);
-  box-shadow: 0 0 0 3px rgba(100, 241, 181, 0.14);
+  border-color: rgba(238, 0, 138, 0.45);
+  box-shadow: 0 0 0 3px rgba(238, 0, 138, 0.14);
 }
 
 .suggestion-list {
@@ -83,9 +83,9 @@
 }
 
 .suggestion-chip {
-  border: 1px solid rgba(148, 163, 184, 0.16);
+  border: 1px solid #dbe2f0;
   border-radius: 18px;
-  background: rgba(15, 27, 45, 0.68);
+  background: #ffffff;
   color: var(--text-strong);
   padding: 14px 16px;
   text-align: left;
@@ -100,8 +100,8 @@
 .assistant-tips article {
   padding: 14px 16px;
   border-radius: var(--radius-md);
-  background: rgba(15, 27, 45, 0.54);
-  border: 1px solid rgba(148, 163, 184, 0.1);
+  background: #f8faff;
+  border: 1px solid #dbe2f0;
 }
 
 .assistant-tips span {

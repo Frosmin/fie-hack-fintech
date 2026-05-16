@@ -1,4 +1,6 @@
+import { useState } from "react";
 import "./Navbar.css";
+import brandIcon from "../../assets/icon.webp";
 
 export type AppView = "dashboard" | "sales" | "chatbot";
 
@@ -6,22 +8,18 @@ const navigation = [
   {
     id: "dashboard",
     label: "Dashboard",
-    description: "Resumen general",
   },
   {
     id: "sales",
     label: "Registro ventas",
-    description: "Nueva operación",
   },
   {
     id: "chatbot",
     label: "Chatbot",
-    description: "Asistente emprendedor",
   },
 ] as const satisfies Array<{
   id: AppView;
   label: string;
-  description: string;
 }>;
 
 interface NavbarProps {
@@ -30,19 +28,45 @@ interface NavbarProps {
 }
 
 export function Navbar({ activeView, onChangeView }: NavbarProps) {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const handleChangeView = (view: AppView) => {
+    onChangeView(view);
+    setIsMenuOpen(false);
+  };
+
   return (
     <header className="navbar">
       <div className="navbar__brand">
-        <div className="navbar__mark" aria-hidden="true">
-          EH
-        </div>
+        <img
+          className="navbar__mark"
+          src={brandIcon}
+          alt="Tinka Emprende Hub"
+        />
         <div>
-          <span className="navbar__eyebrow">Emprende Hub</span>
-          <strong>Fintech para arrancar tu idea</strong>
+          <span className="navbar__eyebrow">Comunidad Tinka</span>
+          <strong>Tu registro de ventas, claro y rapido</strong>
         </div>
       </div>
 
-      <nav className="navbar__nav" aria-label="Navegación principal">
+      <button
+        type="button"
+        className="navbar__toggle"
+        aria-label="Abrir menu"
+        aria-expanded={isMenuOpen}
+        aria-controls="navbar-menu"
+        onClick={() => setIsMenuOpen((open) => !open)}
+      >
+        <span />
+        <span />
+        <span />
+      </button>
+
+      <nav
+        id="navbar-menu"
+        className={isMenuOpen ? "navbar__nav is-open" : "navbar__nav"}
+        aria-label="Navegación principal"
+      >
         {navigation.map((item) => (
           <button
             key={item.id}
@@ -50,11 +74,10 @@ export function Navbar({ activeView, onChangeView }: NavbarProps) {
             className={
               item.id === activeView ? "navbar__tab is-active" : "navbar__tab"
             }
-            onClick={() => onChangeView(item.id)}
+            onClick={() => handleChangeView(item.id)}
             aria-current={item.id === activeView ? "page" : undefined}
           >
             <span>{item.label}</span>
-            <small>{item.description}</small>
           </button>
         ))}
       </nav>

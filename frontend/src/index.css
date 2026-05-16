@@ -1,34 +1,35 @@
 :root {
-  color-scheme: dark;
-  --bg: #07111f;
-  --surface: rgba(10, 19, 35, 0.76);
-  --surface-strong: #0f1b2d;
-  --surface-soft: rgba(15, 27, 45, 0.92);
-  --line: rgba(148, 163, 184, 0.14);
-  --text: #cad8ea;
-  --text-strong: #f8fbff;
-  --muted: #8ea0bb;
-  --primary: #12b886;
-  --primary-strong: #64f1b5;
-  --secondary: #ffb86b;
-  --warning: #ff8a65;
-  --shadow-lg: 0 24px 64px rgba(1, 6, 15, 0.38), 0 8px 24px rgba(1, 6, 15, 0.2);
+  color-scheme: light;
+  --bg: #ffffff;
+  --surface: #ffffff;
+  --surface-strong: #f2f2f2;
+  --surface-soft: #f8f9fb;
+  --line: #dadada;
+  --text: #2b4382;
+  --text-strong: #2b4382;
+  --muted: #5e6d94;
+  --primary: #ee008a;
+  --primary-strong: #e1278d;
+  --secondary: #005ba7;
+  --warning: #e02c88;
+  --shadow-lg:
+    0 14px 34px rgba(43, 67, 130, 0.1), 0 6px 14px rgba(43, 67, 130, 0.06);
   --radius-xl: 28px;
   --radius-lg: 22px;
   --radius-md: 16px;
-  --sans: "Segoe UI Variable", "Aptos", "Trebuchet MS", sans-serif;
+  --sans: "Avenir Next LT Pro", avenir, Arial, sans-serif;
   --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
 
   font: 16px/1.55 var(--sans);
   color: var(--text);
   background:
-    radial-gradient(circle at top, rgba(18, 184, 134, 0.12), transparent 28%),
+    radial-gradient(circle at top, rgba(68, 194, 244, 0.18), transparent 30%),
     radial-gradient(
       circle at 80% 10%,
-      rgba(255, 184, 107, 0.08),
-      transparent 20%
+      rgba(238, 0, 138, 0.12),
+      transparent 28%
     ),
-    linear-gradient(180deg, #07111f 0%, #050c17 100%);
+    linear-gradient(180deg, #ffffff 0%, #f4f8ff 100%);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -78,6 +79,6 @@ p {
 }
 
 ::selection {
-  background: rgba(100, 241, 181, 0.32);
-  color: var(--text-strong);
+  background: rgba(68, 194, 244, 0.32);
+  color: #1d2f5a;
 }

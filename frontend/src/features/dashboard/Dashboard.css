@@ -94,7 +94,7 @@
 .panel__badge {
   padding: 8px 12px;
   border-radius: 999px;
-  background: rgba(18, 184, 134, 0.14);
+  background: rgba(68, 194, 244, 0.16);
   color: var(--primary-strong);
   font-size: 0.82rem;
   font-weight: 600;
@@ -123,9 +123,9 @@
   background: linear-gradient(
     180deg,
     var(--primary-strong),
-    rgba(18, 184, 134, 0.2)
+    rgba(238, 0, 138, 0.2)
   );
-  box-shadow: 0 16px 30px rgba(18, 184, 134, 0.18);
+  box-shadow: 0 16px 30px rgba(43, 67, 130, 0.12);
 }
 
 .chart__bar-wrap span {
@@ -144,9 +144,9 @@
 .priority-list li {
   padding: 14px 16px;
   border-radius: var(--radius-md);
-  background: rgba(15, 27, 45, 0.54);
-  border: 1px solid rgba(148, 163, 184, 0.1);
-  color: var(--text);
+  background: #f8faff;
+  border: 1px solid #dbe2f0;
+  color: var(--text-strong);
 }
 
 @media (max-width: 1080px) {
