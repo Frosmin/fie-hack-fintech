@@ -13,10 +13,167 @@ datasource db {
 }
 
 model User {
-  id           BigInt   @id @default(autoincrement())
+  id           BigInt      @id @default(autoincrement())
   name         String
-  email        String   @unique
+  email        String     @unique
   passwordHash String
-  role         String   @default("analyst")
-  createdAt    DateTime @default(now())
+  role         String     @default("analyst")
+  createdAt    DateTime   @default(now())
+  businesses   Business[]
+}
+
+model Business {
+  id          BigInt      @id @default(autoincrement())
+  name        String
+  description String?
+  logoUrl     String?
+  address     String?
+  phone       String?
+  isActive    Boolean     @default(true)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  userId      BigInt
+  user        User        @relation(fields: [userId], references: [id])
+  activities  Activity[]
+  products    Product[]
+  sales       Sale[]
+
+  @@index([userId])
+}
+
+model Activity {
+  id          BigInt      @id @default(autoincrement())
+  name        String
+  description String?
+  icon        String?
+  color       String?
+  isActive    Boolean     @default(true)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  businessId  BigInt
+  business    Business    @relation(fields: [businessId], references: [id])
+  products    Product[]
+
+  @@index([businessId])
+}
+
+model Product {
+  id           BigInt      @id @default(autoincrement())
+  name         String
+  description  String?
+  sku          String?     @unique
+  basePrice    Decimal     @db.Decimal(10, 2)
+  cost         Decimal?    @db.Decimal(10, 2)
+  unit         String      @default("unidad")
+  imageUrl     String?
+  isActive     Boolean     @default(true)
+  minPrice     Decimal?    @db.Decimal(10, 2)
+  maxPrice     Decimal?    @db.Decimal(10, 2)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  businessId   BigInt
+  business     Business     @relation(fields: [businessId], references: [id])
+  activityId   BigInt?
+  activity     Activity?    @relation(fields: [activityId], references: [id])
+  saleItems    SaleItem[]
+
+  @@index([businessId])
+  @@index([activityId])
+}
+
+model Sale {
+  id              BigInt        @id @default(autoincrement())
+  invoiceNumber   String?       @unique
+  status          SaleStatus    @default(PENDIENTE)
+  subtotal        Decimal       @db.Decimal(12, 2)
+  taxAmount       Decimal       @db.Decimal(10, 2) @default(0)
+  totalAmount     Decimal       @db.Decimal(12, 2)
+
+  customerName    String?
+  customerPhone   String?
+  customerEmail   String?
+
+  locationAddress String?
+  locationCity    String?
+  locationState   String?
+  latitude        Decimal?      @db.Decimal(9, 6)
+  longitude       Decimal?      @db.Decimal(9, 6)
+
+  channel         SaleChannel   @default(PERSONAL)
+  notes           String?
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  completedAt     DateTime?
+
+  businessId      BigInt
+  business        Business       @relation(fields: [businessId], references: [id])
+  paymentMethodId BigInt
+  paymentMethod   PaymentMethod @relation(fields: [paymentMethodId], references: [id])
+  items           SaleItem[]
+
+  @@index([businessId])
+  @@index([status])
+  @@index([createdAt])
+  @@index([channel])
+}
+
+model SaleItem {
+  id          BigInt    @id @default(autoincrement())
+  quantity    Decimal   @db.Decimal(8, 2) @default(1)
+  unitPrice   Decimal   @db.Decimal(10, 2)
+  discount    Decimal   @db.Decimal(10, 2) @default(0)
+  subtotal    Decimal   @db.Decimal(12, 2)
+  notes       String?
+  createdAt   DateTime  @default(now())
+
+  saleId      BigInt
+  sale        Sale      @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  productId   BigInt
+  product     Product   @relation(fields: [productId], references: [id])
+
+  @@index([saleId])
+  @@index([productId])
+}
+
+model PaymentMethod {
+  id        BigInt       @id @default(autoincrement())
+  name      String
+  type      PaymentType
+  icon      String?
+  isActive  Boolean      @default(true)
+  isDefault Boolean      @default(false)
+  sortOrder Int          @default(0)
+
+  sales     Sale[]
+
+  @@index([type])
+}
+
+enum SaleStatus {
+  PENDIENTE
+  CONFIRMADO
+  COBRADO
+  CANCELADO
+  REEMBOLSADO
+}
+
+enum SaleChannel {
+  WHATSAPP
+  INSTAGRAM
+  WEB
+  TIENDA
+  PERSONAL
+  OTRO
+}
+
+enum PaymentType {
+  CASH
+  CARD
+  TRANSFER
+  WALLET
+  OTHER
 }
