@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
-import prisma from "../config/prisma";
-import AppError from "../errors/appError";
+import prisma from "../config/prisma.js";
+import AppError from "../errors/appError.js";
 
 export async function registerUser(userData) {
   const { name, email, password } = userData;

@@ -1,7 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
-import * as authService from "../services/auth.service";
-import AppError from "../errors/appError";
-import { serializeBigInt } from "../helpers/serialize.helper";
+import * as authService from "../services/auth.service.js";
+import AppError from "../errors/appError.js";
+import { serializeBigInt } from "../helpers/serialize.helper.js";
 
 export async function registerUser(
   req: Request,

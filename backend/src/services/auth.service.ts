@@ -1,9 +1,9 @@
-import * as userRepository from "../repositories/users.repository.ts";
-import * as authRepository from "../repositories/auth.repository.ts";
+import * as userRepository from "../repositories/users.repository.js";
+import * as authRepository from "../repositories/auth.repository.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import AppError from "../errors/appError.ts";
-import { DEFAULTS } from "../config";
+import AppError from "../errors/appError.js";
+import { DEFAULTS } from "../config.js";
 
 export async function registerUser(userData) {
   const { email } = userData;
