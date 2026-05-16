@@ -73,7 +73,7 @@ function signToken(user: UserPayload) {
   if (!secret) {
     throw new AppError("JWT secret is not configured", 500);
   }
-  return jwt.sign(payload, secret, { expiresIn: DEFAULTS.JWT_EXPIRES_IN });
+  return jwt.sign(payload, secret, { expiresIn: DEFAULTS.JWT_EXPIRES_IN as any });
 }
 
 function sanitize(user: UserPayload) {
