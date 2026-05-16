@@ -43,7 +43,7 @@
   "include": [
     "src/**/*.ts",
     "src/**/*.d.ts"
-  ],
+, "src/middlewares/auth.middleware.ts"  ],
   "exclude": [
     "node_modules",
     "dist",
