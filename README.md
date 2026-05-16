@@ -11,7 +11,7 @@ Aplicacion frontend del proyecto **Herramienta Digital para Emprendedores Tinka*
 
 El siguiente diagrama resume los componentes principales del sistema propuesto:
 
-![Diagrama de componentes](../docs/assets/diagrama-componentes.png)
+![Diagrama de componentes](docs/assets/diagrama-componentes.png)
 
 ## Stack base
 
