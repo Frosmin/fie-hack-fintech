@@ -5,7 +5,27 @@ import jwt from "jsonwebtoken";
 import AppError from "../errors/appError.js";
 import { DEFAULTS } from "../config.js";
 
-export async function registerUser(userData) {
+interface RegisterInput {
+  name: string;
+  email: string;
+  password: string;
+}
+
+interface LoginInput {
+  email: string;
+  password: string;
+}
+
+interface UserPayload {
+  id: bigint | string;
+  email: string;
+  name: string;
+  role: string;
+  passwordHash?: string;
+  createdAt?: Date;
+}
+
+export async function registerUser(userData: RegisterInput) {
   const { email } = userData;
 
   const existingUser = await userRepository.findUserByEmail(email);
@@ -21,7 +41,7 @@ export async function registerUser(userData) {
   };
 }
 
-export async function loginUser(userData) {
+export async function loginUser(userData: LoginInput) {
   const { email, password } = userData;
 
   const user = await userRepository.findUserByEmail(email);
@@ -42,7 +62,7 @@ export async function loginUser(userData) {
   };
 }
 
-function signToken(user) {
+function signToken(user: UserPayload) {
   const payload = {
     sub: String(user.id),
     email: user.email,
@@ -56,7 +76,7 @@ function signToken(user) {
   return jwt.sign(payload, secret, { expiresIn: DEFAULTS.JWT_EXPIRES_IN });
 }
 
-function sanitize(user) {
+function sanitize(user: UserPayload) {
   if (!user) return user;
   const { passwordHash, ...rest } = user;
   return rest;

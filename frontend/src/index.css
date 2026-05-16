@@ -17,7 +17,7 @@
   --radius-xl: 28px;
   --radius-lg: 22px;
   --radius-md: 16px;
-  --sans: "Avenir Next LT Pro", avenir, Arial, sans-serif;
+  --sans: "Inter", "Avenir Next LT Pro", avenir, Arial, sans-serif;
   --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
 
   font: 16px/1.55 var(--sans);
