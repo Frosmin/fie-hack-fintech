@@ -1,0 +1,124 @@
+.sales {
+  display: grid;
+  gap: 20px;
+}
+
+.sales__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(300px, 0.9fr);
+  gap: 16px;
+}
+
+.sales-form__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.sales-form__grid label {
+  display: grid;
+  gap: 8px;
+  color: var(--text-strong);
+  font-weight: 500;
+}
+
+.sales-form__grid input,
+.sales-form__grid select,
+.sales-form__grid textarea {
+  width: 100%;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 16px;
+  background: rgba(15, 27, 45, 0.7);
+  color: var(--text-strong);
+  padding: 14px 14px;
+  outline: none;
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.sales-form__grid textarea {
+  resize: vertical;
+  min-height: 130px;
+}
+
+.sales-form__grid input::placeholder,
+.sales-form__grid textarea::placeholder {
+  color: var(--muted);
+}
+
+.sales-form__grid input:focus,
+.sales-form__grid select:focus,
+.sales-form__grid textarea:focus {
+  border-color: rgba(100, 241, 181, 0.5);
+  box-shadow: 0 0 0 3px rgba(100, 241, 181, 0.14);
+}
+
+.sales-form__notes {
+  grid-column: 1 / -1;
+}
+
+.primary-action {
+  grid-column: 1 / -1;
+  margin-top: 4px;
+  border: 0;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: #081120;
+  font-weight: 700;
+  padding: 15px 18px;
+  cursor: pointer;
+  box-shadow: 0 18px 32px rgba(18, 184, 134, 0.22);
+}
+
+.sales-list__items {
+  display: grid;
+  gap: 12px;
+}
+
+.sale-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  padding: 16px;
+  border-radius: var(--radius-md);
+  background: rgba(15, 27, 45, 0.54);
+  border: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.sale-item strong,
+.sale-item span {
+  display: block;
+}
+
+.sale-item strong {
+  color: var(--text-strong);
+}
+
+.sale-item span {
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.sale-item__meta {
+  text-align: right;
+}
+
+@media (max-width: 980px) {
+  .sales__grid,
+  .sales-form__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .sale-item {
+    flex-direction: column;
+    align-items: start;
+  }
+
+  .sale-item__meta {
+    text-align: left;
+  }
+}
