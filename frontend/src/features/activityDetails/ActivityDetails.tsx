@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import brandIcon from "../../assets/icon.webp";
 import "./ActivityDetails.css";
 
 const API_BASE = "http://localhost:3000/api";
