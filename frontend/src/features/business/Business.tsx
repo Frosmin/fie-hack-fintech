@@ -283,8 +283,8 @@ export function Business() {
                 style={{ cursor: "pointer" }}
               >
                 <div className="business-card__header">
-                  <div className="activity-card__icon">
-                    {act.icon || "📋"}
+                  <div className="activity-card__icon" style={{ textTransform: "uppercase", color: "var(--primary)", fontWeight: 700 }}>
+                    {act.name.charAt(0)}
                   </div>
                   <div className="business-card__info">
                     <h3 className="business-card__name">{act.name}</h3>
