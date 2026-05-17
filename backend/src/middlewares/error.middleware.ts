@@ -9,7 +9,7 @@ const errorHandler = (
   const isProduction = process.env.NODE_ENV === "production";
 
   if (err.isOperational) {
-    return res.status(err.statusCode).json({
+    return res.status(err.statusCode ?? 500).json({
       error: err.message,
     });
   }
