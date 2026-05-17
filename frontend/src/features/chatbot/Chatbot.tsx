@@ -1,10 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
+import pigHappy from "../../assets/character/pig-happy.webp";
+import pigNeutral from "../../assets/character/pig-neutral.webp";
+import pigPensante from "../../assets/character/pig-pensante.webp";
+import pigSad from "../../assets/character/pig-sad.webp";
 import "./Chatbot.css";
 
 const API_URL = "http://localhost:3000/api/chatbot/message";
 
 type ChatRole = "user" | "assistant";
+type AssistantMood = "neutral" | "thinking" | "happy" | "sad";
 
 interface ChatMessage {
   id: string;
@@ -36,19 +41,68 @@ function createMessage(role: ChatRole, content: string): ChatMessage {
   };
 }
 
-/* ── Inline SVG icons ── */
+const assistantCharacterByMood: Record<AssistantMood, string> = {
+  neutral: pigNeutral,
+  thinking: pigPensante,
+  happy: pigHappy,
+  sad: pigSad,
+};
 
-function SparklesIcon({ size = 22 }: { size?: number }) {
+function getAssistantMood(
+  messages: ChatMessage[],
+  loading: boolean,
+  error: string,
+): AssistantMood {
+  if (error) return "sad";
+  if (loading) return "thinking";
+  if (
+    messages.some(
+      (message) => message.role === "assistant" && message.id !== "welcome",
+    )
+  ) {
+    return "happy";
+  }
+  return "neutral";
+}
+
+function CharacterAvatar({
+  mood,
+  size = 40,
+  className = "",
+  alt,
+}: {
+  mood: AssistantMood;
+  size?: number;
+  className?: string;
+  alt: string;
+}) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 3l1.912 5.813a2 2 0 0 0 1.275 1.275L21 12l-5.813 1.912a2 2 0 0 0-1.275 1.275L12 21l-1.912-5.813a2 2 0 0 0-1.275-1.275L3 12l5.813-1.912a2 2 0 0 0 1.275-1.275L12 3z" />
-    </svg>
+    <img
+      className={`character-avatar ${className}`.trim()}
+      src={assistantCharacterByMood[mood]}
+      alt={alt}
+      width={size}
+      height={size}
+      loading="eager"
+      decoding="async"
+    />
   );
 }
 
+/* ── Inline SVG icons ── */
+
 function SendIcon() {
   return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <path d="M22 2L11 13" />
       <path d="M22 2l-7 20-4-9-9-4 20-7z" />
     </svg>
@@ -57,7 +111,16 @@ function SendIcon() {
 
 function LightbulbIcon() {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <path d="M9 18h6" />
       <path d="M10 22h4" />
       <path d="M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2z" />
@@ -67,7 +130,16 @@ function LightbulbIcon() {
 
 function ShieldIcon() {
   return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
     </svg>
   );
@@ -75,7 +147,16 @@ function ShieldIcon() {
 
 function EyeIcon() {
   return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
       <circle cx="12" cy="12" r="3" />
     </svg>
@@ -84,17 +165,18 @@ function EyeIcon() {
 
 function ArrowIcon() {
   return (
-    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      width="10"
+      height="10"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <path d="M5 12h14" />
       <path d="M12 5l7 7-7 7" />
-    </svg>
-  );
-}
-
-function BotAvatar() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 3l1.912 5.813a2 2 0 0 0 1.275 1.275L21 12l-5.813 1.912a2 2 0 0 0-1.275 1.275L12 21l-1.912-5.813a2 2 0 0 0-1.275-1.275L3 12l5.813-1.912a2 2 0 0 0 1.275-1.275L12 3z" />
     </svg>
   );
 }
@@ -105,9 +187,13 @@ export function Chatbot() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const assistantMood = getAssistantMood(messages, loading, error);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+    messagesEndRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "end",
+    });
   }, [messages, loading]);
 
   async function sendMessage(message: string) {
@@ -147,7 +233,9 @@ export function Chatbot() {
 
       const data = await response.json().catch(() => ({}));
       if (!response.ok) {
-        throw new Error(data.error || "No se pudo obtener respuesta del asistente");
+        throw new Error(
+          data.error || "No se pudo obtener respuesta del asistente",
+        );
       }
 
       setMessages((prev) => [
@@ -172,19 +260,25 @@ export function Chatbot() {
 
   return (
     <section className="chatbot">
-      {/* ── Hero header ── */}
       <div className="chat-hero">
         <div className="chat-hero__top">
-          <div className="chat-hero__icon">
-            <SparklesIcon size={24} />
+          <div className="chat-hero__icon chat-hero__icon--character">
+            <CharacterAvatar
+              mood={"neutral"}
+              size={48}
+              alt="Personaje asistente Tinka"
+              className="character-avatar--hero"
+            />
           </div>
           <div className="chat-hero__label">
-            <span className="chat-hero__badge">Inteligencia Artificial · Activa</span>
             <h2>Tinka IA</h2>
+
           </div>
         </div>
         <p className="chat-hero__desc">
-          Tu asistente inteligente para consultar negocios, actividades, productos, ventas y transacciones con respuestas basadas en tus registros.
+          Tu asistente inteligente para consultar negocios, actividades,
+          productos, ventas y transacciones con respuestas basadas en tus
+          registros.
         </p>
       </div>
 
@@ -194,12 +288,11 @@ export function Chatbot() {
         <article className="chat-panel">
           <div className="chat-panel__header">
             <div className="chat-panel__header-left">
-              <div className="chat-panel__avatar">
-                <BotAvatar />
-              </div>
               <div className="chat-panel__title-group">
                 <span className="chat-panel__title">Asistente Tinka</span>
-                <span className="chat-panel__subtitle">Analisis inteligente de tu negocio</span>
+                <span className="chat-panel__subtitle">
+                  Analisis inteligente de tu negocio
+                </span>
               </div>
             </div>
             <span className="chat-panel__model-badge">✦ Gemini 2.5</span>
@@ -217,7 +310,12 @@ export function Chatbot() {
               >
                 <div className="chat-message__avatar">
                   {message.role === "assistant" ? (
-                    <BotAvatar />
+                    <CharacterAvatar
+                      mood={assistantMood}
+                      size={34}
+                      alt="Personaje asistente Tinka"
+                      className="character-avatar--message"
+                    />
                   ) : (
                     "Tu"
                   )}
@@ -234,11 +332,19 @@ export function Chatbot() {
             {loading && (
               <div className="chat-message chat-message--assistant">
                 <div className="chat-message__avatar">
-                  <BotAvatar />
+                  <CharacterAvatar
+                    mood="thinking"
+                    size={34}
+                    alt="Personaje asistente Tinka pensando"
+                    className="character-avatar--message"
+                  />
                 </div>
                 <div className="chat-message__bubble">
                   <span className="chat-message__name">Tinka IA</span>
-                  <div className="typing-indicator" aria-label="Generando respuesta">
+                  <div
+                    className="typing-indicator"
+                    aria-label="Generando respuesta"
+                  >
                     <span />
                     <span />
                     <span />
@@ -286,7 +392,9 @@ export function Chatbot() {
               <div className="suggestion-card__header-icon">
                 <LightbulbIcon />
               </div>
-              <span className="suggestion-card__title">Preguntas sugeridas</span>
+              <span className="suggestion-card__title">
+                Preguntas sugeridas
+              </span>
             </div>
             <div className="suggestion-list">
               {suggestions.map((item) => (

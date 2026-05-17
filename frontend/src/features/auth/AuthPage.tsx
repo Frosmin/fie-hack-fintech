@@ -1,13 +1,8 @@
 import { useState, useCallback, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
-import "./AuthPage.css";
 import brandIcon from "../../assets/logo/logo-text-fie-white.webp";
-import { useState, useCallback, type FormEvent } from "react";
-import { useNavigate } from "react-router-dom";
-import brandIcon from "../../assets/icon.webp";
 import "./AuthPage.css";
 
-const API_URL = "http://localhost:3000/api/auth";
 const API_URL = "http://localhost:3000/api/auth";
 
 interface AuthUser {
@@ -15,13 +10,7 @@ interface AuthUser {
   name: string;
   email: string;
   role: string;
-  id: string;
-  name: string;
-  email: string;
-  role: string;
 }
-
-type Mode = "login" | "register";
 
 type Mode = "login" | "register";
 
@@ -49,14 +38,6 @@ function IconMail() {
       strokeLinecap="round"
       strokeLinejoin="round"
     >
-    <svg
-      viewBox="0 0 20 20"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
       <rect x="2" y="4" width="16" height="12" rx="2" />
       <path d="M2 4l8 6 8-6" />
     </svg>
@@ -65,14 +46,6 @@ function IconMail() {
 
 function IconLock() {
   return (
-    <svg
-      viewBox="0 0 20 20"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
     <svg
       viewBox="0 0 20 20"
       fill="none"
@@ -97,14 +70,6 @@ function IconUser() {
       strokeLinecap="round"
       strokeLinejoin="round"
     >
-    <svg
-      viewBox="0 0 20 20"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
       <circle cx="10" cy="7" r="3" />
       <path d="M4 17c0-3.3 2.7-6 6-6s6 2.7 6 6" />
     </svg>
@@ -113,14 +78,6 @@ function IconUser() {
 
 function IconEye() {
   return (
-    <svg
-      viewBox="0 0 20 20"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
     <svg
       viewBox="0 0 20 20"
       fill="none"
@@ -145,14 +102,6 @@ function IconEyeOff() {
       strokeLinecap="round"
       strokeLinejoin="round"
     >
-    <svg
-      viewBox="0 0 20 20"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
       <path d="M1 10s3.5-6 9-6c1.5 0 2.8.4 4 1" />
       <path d="M17.5 7A14.5 14.5 0 0 1 19 10s-3.5 6-9 6c-1.2 0-2.3-.3-3.3-.7" />
       <line x1="2" y1="2" x2="18" y2="18" />
@@ -163,11 +112,6 @@ function IconEyeOff() {
 function IconAlert() {
   return (
     <svg className="auth-alert__icon" viewBox="0 0 20 20" fill="currentColor">
-      <path
-        fillRule="evenodd"
-        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z"
-        clipRule="evenodd"
-      />
       <path
         fillRule="evenodd"
         d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z"
@@ -189,23 +133,12 @@ function IconArrow() {
       strokeLinecap="round"
       strokeLinejoin="round"
     >
-    <svg
-      width="18"
-      height="18"
-      viewBox="0 0 20 20"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
       <path d="M5 10h10M12 6l4 4-4 4" />
     </svg>
   );
 }
 
 export function AuthPage() {
-  const navigate = useNavigate();
   const navigate = useNavigate();
   const [mode, setMode] = useState<Mode>("login");
   const [name, setName] = useState("");
@@ -278,9 +211,6 @@ export function AuthPage() {
         return;
       }
 
-      const { token, user } = data as { token: string; user: AuthUser };
-      localStorage.setItem("auth_token", token);
-      localStorage.setItem("auth_user", JSON.stringify(user));
       navigate("/", { replace: true });
       const { token, user } = data as { token: string; user: AuthUser };
       localStorage.setItem("auth_token", token);
@@ -423,7 +353,6 @@ export function AuthPage() {
                   type={showPw ? "text" : "password"}
                   placeholder={
                     mode === "login" ? "Tu contraseña" : "Mínimo 6 caracteres"
-                    mode === "login" ? "Tu contraseña" : "Mínimo 6 caracteres"
                   }
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -436,9 +365,6 @@ export function AuthPage() {
                   type="button"
                   className="auth-field__toggle-pw"
                   onClick={() => setShowPw((v) => !v)}
-                  aria-label={
-                    showPw ? "Ocultar contraseña" : "Mostrar contraseña"
-                  }
                   aria-label={
                     showPw ? "Ocultar contraseña" : "Mostrar contraseña"
                   }
@@ -506,9 +432,6 @@ export function AuthPage() {
                       showConfirmPw
                         ? "Ocultar contraseña"
                         : "Mostrar contraseña"
-                      showConfirmPw
-                        ? "Ocultar contraseña"
-                        : "Mostrar contraseña"
                     }
                     tabIndex={-1}
                   >
@@ -549,7 +472,6 @@ export function AuthPage() {
           </div>
 
           <p className="auth-switch">
-            {mode === "login" ? "¿No tienes cuenta?" : "¿Ya tienes cuenta?"}
             {mode === "login" ? "¿No tienes cuenta?" : "¿Ya tienes cuenta?"}
             <button
               type="button"
