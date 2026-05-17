@@ -1,5 +1,6 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import * as XLSX from "xlsx";
 import "./ActivityDetails.css";
 
 const API_BASE = "http://localhost:3000/api";
@@ -110,6 +111,18 @@ export function ActivityDetails() {
     accountNumber: "",
   });
   const [successMessage, setSuccessMessage] = useState("");
+  const [showImportModal, setShowImportModal] = useState(false);
+  const [importData, setImportData] = useState<Array<{
+    nameCuate: string;
+    amount: number;
+    type: string;
+    description: string;
+    bankName: string;
+    accountNumber: string;
+    error?: string;
+  }>>([]);
+  const [importing, setImporting] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const token = localStorage.getItem("auth_token");
 
@@ -197,6 +210,193 @@ export function ActivityDetails() {
       setError("No se pudo crear la transacción");
     } finally {
       setSubmitting(false);
+    }
+  }
+
+  function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const data = new Uint8Array(event.target?.result as ArrayBuffer);
+        const workbook = XLSX.read(data, { type: "array" });
+        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+        const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 }) as string[][];
+
+        if (jsonData.length < 2) {
+          alert("El archivo está vacío o no tiene datos");
+          return;
+        }
+
+        const headers = jsonData[0].map((h) => h?.toString().trim().toLowerCase() || "");
+        
+        const headerMapping: Record<string, string> = {
+          amount: "amount",
+          monto: "amount",
+          "monto (bs)": "amount",
+          namecuate: "namecuate",
+          nombre: "namecuate",
+          "nombre del contacto": "namecuate",
+          type: "type",
+          tipo: "type",
+          "tipo de operación": "type",
+          description: "description",
+          descripcion: "description",
+          descripción: "description",
+          nota: "description",
+          "nota (opcional)": "description",
+          bankname: "bankname",
+          banco: "bankname",
+          accountnumber: "accountnumber",
+          cuenta: "accountnumber",
+          "nro. cuenta": "accountnumber",
+          "nro cuenta": "accountnumber",
+          "número de cuenta": "accountnumber",
+        };
+
+        const normalizedHeaders = headers.map((h) => headerMapping[h] || h);
+        
+        const requiredHeaders = ["amount", "namecuate", "type"];
+        const missingHeaders = requiredHeaders.filter((h) => !normalizedHeaders.includes(h));
+        if (missingHeaders.length > 0) {
+          alert(`Faltan columnas requeridas: ${missingHeaders.join(", ")}`);
+          return;
+        }
+
+        const rows = jsonData.slice(1).filter((row) => row.some((cell) => cell !== undefined && cell !== ""));
+        if (rows.length === 0) {
+          alert("No hay datos para importar");
+          return;
+        }
+
+        if (rows.length > 500) {
+          alert("Máximo 500 filas permitidas");
+          return;
+        }
+
+        const parsedData = rows.map((row, index) => {
+          const getValue = (header: string) => {
+            const colIndex = normalizedHeaders.indexOf(header);
+            return colIndex >= 0 ? row[colIndex] : undefined;
+          };
+
+          const amount = getValue("amount");
+          const nameCuate = getValue("namecuate");
+          const type = getValue("type")?.toString().toUpperCase().trim();
+          const description = getValue("description")?.toString() || "";
+          const bankName = getValue("bankname")?.toString() || "";
+          const accountNumber = getValue("accountnumber")?.toString() || "";
+
+          const typeTranslation: Record<string, string> = {
+            deposito: "DEPOSIT",
+            deposito: "DEPOSIT",
+            depósito: "DEPOSIT",
+            reembolso: "REFUND",
+            ref: "REFUND",
+            pago: "PAYMENT",
+            retiro: "WITHDRAWAL",
+            withdrawal: "WITHDRAWAL",
+            transferencia: "TRANSFER",
+            transfer: "TRANSFER",
+          };
+
+          let normalizedType = type || "";
+          if (normalizedType && typeTranslation[normalizedType.toLowerCase()]) {
+            normalizedType = typeTranslation[normalizedType.toLowerCase()];
+          }
+
+          let error: string | undefined;
+          const allowedTypes = formMode === "charge" 
+            ? ["DEPOSIT", "REFUND"] 
+            : ["PAYMENT", "WITHDRAWAL", "TRANSFER"];
+
+          if (!nameCuate || nameCuate.toString().trim() === "") {
+            error = "Nombre requerido";
+          } else if (!amount || isNaN(Number(amount)) || Number(amount) <= 0) {
+            error = "Monto inválido";
+          } else if (!normalizedType || !allowedTypes.includes(normalizedType)) {
+            const validOpts = formMode === "charge" ? "Depósito, Reembolso (o DEPOSIT, REFUND)" : "Pago, Retiro, Transferencia (o PAYMENT, WITHDRAWAL, TRANSFER)";
+            error = `Tipo inválido. Use: ${validOpts}`;
+          }
+
+          return {
+            nameCuate: nameCuate?.toString().trim() || "",
+            amount: Number(amount) || 0,
+            type: normalizedType,
+            description,
+            bankName,
+            accountNumber,
+            error,
+          };
+        });
+
+        setImportData(parsedData);
+        setShowImportModal(true);
+      } catch (err) {
+        alert("Error al procesar el archivo");
+        console.error(err);
+      }
+    };
+    reader.readAsArrayBuffer(file);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  }
+
+  async function handleImportConfirm() {
+    if (!id) return;
+
+    const validTransactions = importData.filter((tx) => !tx.error);
+    if (validTransactions.length === 0) {
+      alert("No hay transacciones válidas para importar");
+      return;
+    }
+
+    setImporting(true);
+    try {
+      const res = await fetch(`${API_BASE}/transactions/batch`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          activityId: Number(id),
+          mode: formMode,
+          transactions: validTransactions.map((tx) => ({
+            nameCuate: tx.nameCuate,
+            amount: tx.amount,
+            type: tx.type,
+            description: tx.description || null,
+            bankName: tx.bankName || null,
+            accountNumber: tx.accountNumber || null,
+          })),
+        }),
+      });
+
+      const result = await res.json();
+
+      if (!res.ok) {
+        alert(result.error || "Error al importar transacciones");
+        return;
+      }
+
+      setShowImportModal(false);
+      setImportData([]);
+      await Promise.all([fetchActivity(), fetchTransactions()]);
+
+      let message = `Se importaron ${result.created} transacciones`;
+      if (result.failed > 0) {
+        message += `, ${result.failed} fallidas`;
+      }
+      setSuccessMessage(message);
+      setTimeout(() => setSuccessMessage(""), 5000);
+    } catch {
+      alert("Error al importar transacciones");
+    } finally {
+      setImporting(false);
     }
   }
 
@@ -514,6 +714,33 @@ export function ActivityDetails() {
             </div>
 
             <form className="ad__form-body" onSubmit={handleSubmit}>
+              {/* Import Section - at the top */}
+              <div className="ad__form-import-section">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".csv,.xlsx,.xls"
+                  onChange={handleFileUpload}
+                  style={{ display: "none" }}
+                />
+                <div className="ad__form-import-info">
+                  <span className="ad__form-import-label">Importación masiva</span>
+                  <span className="ad__form-import-desc">Importa varios movimientos desde un archivo Excel o CSV</span>
+                </div>
+                <button
+                  type="button"
+                  className="ad__form-import-btn"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="17 8 12 3 7 8" />
+                    <line x1="12" y1="3" x2="12" y2="15" />
+                  </svg>
+                  Importar archivo
+                </button>
+              </div>
+
               {/* Amount — big and prominent */}
               <div className="ad__form-amount-section">
                 <label htmlFor="tx-amount">Monto (Bs)</label>
@@ -626,6 +853,91 @@ export function ActivityDetails() {
           </div>
         </div>
       )}
+
+      {showImportModal && (
+        <div className="ad__overlay" onClick={() => { setShowImportModal(false); setImportData([]); }}>
+          <div className="ad__import-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="ad__import-header">
+              <h3>Importar transacciones</h3>
+              <p>{formMode === "charge" ? "Modo cobro" : "Modo pago"} - {importData.length} filas</p>
+              <button className="ad__import-close" onClick={() => { setShowImportModal(false); setImportData([]); }} type="button">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M18 6L6 18M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="ad__import-table-wrapper">
+              <table className="ad__import-table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Nombre</th>
+                    <th>Monto</th>
+                    <th>Tipo</th>
+                    <th>Descripción</th>
+                    <th>Banco</th>
+                    <th>Cuenta</th>
+                    <th>Estado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {importData.slice(0, 100).map((row, index) => (
+                    <tr key={index} className={row.error ? "has-error" : ""}>
+                      <td>{index + 1}</td>
+                      <td>{row.nameCuate}</td>
+                      <td>{row.amount.toFixed(2)}</td>
+                      <td>{row.type}</td>
+                      <td>{row.description || "-"}</td>
+                      <td>{row.bankName || "-"}</td>
+                      <td>{row.accountNumber || "-"}</td>
+                      <td>
+                        {row.error ? (
+                          <span className="ad__import-error">{row.error}</span>
+                        ) : (
+                          <span className="ad__import-ok">OK</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              {importData.length > 100 && (
+                <p className="ad__import-note">Mostrando las primeras 100 de {importData.length} filas</p>
+              )}
+            </div>
+
+            <div className="ad__import-footer">
+              <div className="ad__import-stats">
+                <span className="ad__import-stat--ok">
+                  {importData.filter((r) => !r.error).length} válidos
+                </span>
+                <span className="ad__import-stat--error">
+                  {importData.filter((r) => r.error).length} con errores
+                </span>
+              </div>
+              <div className="ad__import-actions">
+                <button
+                  type="button"
+                  className="ad__form-btn ad__form-btn--cancel"
+                  onClick={() => { setShowImportModal(false); setImportData([]); }}
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="button"
+                  className={`ad__form-btn ${formMode === "pay" ? "ad__form-btn--pay" : "ad__form-btn--charge"}`}
+                  onClick={handleImportConfirm}
+                  disabled={importing || importData.filter((r) => !r.error).length === 0}
+                >
+                  {importing ? "Importando..." : `Importar ${importData.filter((r) => !r.error).length} transacciones`}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
+
