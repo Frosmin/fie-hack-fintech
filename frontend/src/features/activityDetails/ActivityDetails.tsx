@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import brandIcon from "../../assets/icon.webp";
 import "./ActivityDetails.css";
 
 const API_BASE = "http://localhost:3000/api";
@@ -81,6 +82,15 @@ function formatDate(dateStr: string) {
   });
 }
 
+function formatShortDate(dateStr: string) {
+  return new Date(dateStr).toLocaleDateString("es-BO", {
+    day: "2-digit",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
 export function ActivityDetails() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -91,6 +101,7 @@ export function ActivityDetails() {
   const [showForm, setShowForm] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [formMode, setFormMode] = useState<"pay" | "charge">("charge");
+  const [showQrModal, setShowQrModal] = useState(false);
   const [formData, setFormData] = useState<TransactionForm>({
     nameCuate: "",
     amount: "",
@@ -176,7 +187,6 @@ export function ActivityDetails() {
       const newTx = await res.json();
       setTransactions((prev) => [newTx, ...prev]);
       setShowForm(false);
-      // Re-fetch activity to get updated balance
       await fetchActivity();
       setSuccessMessage(
         formMode === "pay"
@@ -193,9 +203,11 @@ export function ActivityDetails() {
 
   if (loading) {
     return (
-      <section className="activity-details">
-        <div className="activity-details__loading">
-          <div className="ad-spinner" />
+      <section className="ad">
+        <div className="ad__loading">
+          <div className="ad__loading-ring">
+            <div /><div /><div /><div />
+          </div>
           <span>Cargando actividad...</span>
         </div>
       </section>
@@ -204,11 +216,9 @@ export function ActivityDetails() {
 
   if (error && !activity) {
     return (
-      <section className="activity-details">
-        <div className="activity-details__error">{error}</div>
-        <button className="btn btn--secondary" onClick={() => navigate(-1)}>
-          ← Volver
-        </button>
+      <section className="ad">
+        <div className="ad__error">{error}</div>
+        <button className="ad__back" onClick={() => navigate(-1)}>← Volver</button>
       </section>
     );
   }
@@ -223,286 +233,377 @@ export function ActivityDetails() {
     .filter((t) => t.type === "PAYMENT" || t.type === "WITHDRAWAL")
     .reduce((sum, t) => sum + parseFloat(t.amount), 0);
 
-  return (
-    <section className="activity-details">
-      {/* Back button */}
-      <button
-        className="ad-back-btn"
-        onClick={() => navigate(-1)}
-        type="button"
-      >
-        <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <polyline points="12 4 6 10 12 16" />
-        </svg>
-        Volver
-      </button>
+  const balance = parseFloat(activity.activityMoney);
 
-      {/* Activity header card */}
-      <div className="ad-hero">
-        <div className="ad-hero__left">
-          <div className="ad-hero__icon-wrap">
-            {activity.icon || "📋"}
+  return (
+    <section className="ad">
+      {/* ─── Top bar ─── */}
+      <div className="ad__topbar">
+        <button className="ad__back" onClick={() => navigate(-1)} type="button">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M15 18l-6-6 6-6" />
+          </svg>
+          <span>Volver</span>
+        </button>
+        <div className="ad__topbar-actions">
+          <button className="ad__qr-trigger" onClick={() => setShowQrModal(true)} type="button" title="Ver QR de pago">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="3" width="7" height="7" rx="1" />
+              <rect x="14" y="3" width="7" height="7" rx="1" />
+              <rect x="3" y="14" width="7" height="7" rx="1" />
+              <rect x="14" y="14" width="3" height="3" />
+              <path d="M21 14h-3v3" />
+              <path d="M18 21h3v-3" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      {/* ─── Hero section: two-column layout ─── */}
+      <div className="ad__hero-grid">
+        {/* Left: Activity info + Balance */}
+        <div className="ad__hero-card">
+          <div className="ad__hero-card-glow" />
+          <div className="ad__hero-top">
+            <div className="ad__hero-icon" style={{ color: "white", textTransform: "uppercase" }}>
+              {activity.name.charAt(0)}
+            </div>
+            <div className="ad__hero-info">
+              <span className="ad__hero-eyebrow">Actividad</span>
+              <h1 className="ad__hero-name">{activity.name}</h1>
+              {activity.description && (
+                <p className="ad__hero-desc">{activity.description}</p>
+              )}
+            </div>
           </div>
-          <div className="ad-hero__info">
-            <div className="ad-hero__eyebrow">Actividad</div>
-            <h1 className="ad-hero__title">{activity.name}</h1>
-            {activity.description && (
-              <p className="ad-hero__desc">{activity.description}</p>
-            )}
-            <div className="ad-hero__meta">
-              <span className={`ad-status-badge ${activity.isActive ? "is-active" : ""}`}>
+
+          <div className="ad__hero-balance-section">
+            <div className="ad__hero-balance">
+              <span className="ad__hero-balance-label">Saldo disponible</span>
+              <span className={`ad__hero-balance-value ${balance >= 0 ? "is-positive" : "is-negative"}`}>
+                {formatMoney(balance)}
+              </span>
+            </div>
+            <div className="ad__hero-meta-row">
+              <span className={`ad__badge ${activity.isActive ? "ad__badge--active" : "ad__badge--inactive"}`}>
+                <span className="ad__badge-dot" />
                 {activity.isActive ? "Activa" : "Inactiva"}
               </span>
-              <span className="ad-hero__date">
-                Creada {formatDate(activity.createdAt)}
-              </span>
+              <span className="ad__hero-date">{formatDate(activity.createdAt)}</span>
             </div>
           </div>
         </div>
-        <div className="ad-hero__balance-card">
-          <span className="ad-hero__balance-label">Saldo de actividad</span>
-          <span className="ad-hero__balance-amount">
-            {formatMoney(activity.activityMoney)}
-          </span>
+
+        {/* Right: QR + quick actions */}
+        <div className="ad__qr-card">
+          <div className="ad__qr-card-inner">
+            <span className="ad__qr-label">Escanea para pagar</span>
+            <div className="ad__qr-frame" onClick={() => setShowQrModal(true)}>
+              <img
+                src="/qr_bueno.png"
+                alt="Código QR BancoFie"
+                className="ad__qr-img"
+              />
+              <div className="ad__qr-overlay">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
+                </svg>
+                <span>Ampliar</span>
+              </div>
+            </div>
+            <span className="ad__qr-sublabel">BancoFie · QR Simple</span>
+          </div>
+
+          {/* Quick action buttons */}
+          <div className="ad__quick-actions">
+            <button className="ad__action-btn ad__action-btn--charge" onClick={() => openForm("charge")} type="button">
+              <div className="ad__action-btn-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 5v14M5 12h14" />
+                </svg>
+              </div>
+              <span>Cobrar</span>
+            </button>
+            <button className="ad__action-btn ad__action-btn--pay" onClick={() => openForm("pay")} type="button">
+              <div className="ad__action-btn-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
+              </div>
+              <span>Pagar</span>
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Stats row */}
-      <div className="ad-stats">
-        <div className="ad-stat-card ad-stat-card--income">
-          <div className="ad-stat-card__icon">↓</div>
-          <div className="ad-stat-card__body">
-            <span className="ad-stat-card__label">Ingresos</span>
-            <span className="ad-stat-card__value">{formatMoney(totalIncome)}</span>
+      {/* ─── Stats strip ─── */}
+      <div className="ad__stats-strip">
+        <div className="ad__stat ad__stat--income">
+          <div className="ad__stat-icon-ring">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 5v14M19 12l-7 7-7-7" />
+            </svg>
+          </div>
+          <div className="ad__stat-data">
+            <span className="ad__stat-label">Ingresos</span>
+            <span className="ad__stat-value">{formatMoney(totalIncome)}</span>
           </div>
         </div>
-        <div className="ad-stat-card ad-stat-card--expense">
-          <div className="ad-stat-card__icon">↑</div>
-          <div className="ad-stat-card__body">
-            <span className="ad-stat-card__label">Egresos</span>
-            <span className="ad-stat-card__value">{formatMoney(totalExpense)}</span>
+        <div className="ad__stat-divider" />
+        <div className="ad__stat ad__stat--expense">
+          <div className="ad__stat-icon-ring">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 19V5M5 12l7-7 7 7" />
+            </svg>
+          </div>
+          <div className="ad__stat-data">
+            <span className="ad__stat-label">Egresos</span>
+            <span className="ad__stat-value">{formatMoney(totalExpense)}</span>
           </div>
         </div>
-        <div className="ad-stat-card ad-stat-card--count">
-          <div className="ad-stat-card__icon">📊</div>
-          <div className="ad-stat-card__body">
-            <span className="ad-stat-card__label">Transacciones</span>
-            <span className="ad-stat-card__value">{transactions.length}</span>
+        <div className="ad__stat-divider" />
+        <div className="ad__stat ad__stat--count">
+          <div className="ad__stat-icon-ring">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M4 6h16M4 12h16M4 18h10" />
+            </svg>
+          </div>
+          <div className="ad__stat-data">
+            <span className="ad__stat-label">Movimientos</span>
+            <span className="ad__stat-value">{transactions.length}</span>
           </div>
         </div>
       </div>
 
-      {/* Success message */}
+      {/* ─── Toast ─── */}
       {successMessage && (
-        <div className="ad-success-toast">{successMessage}</div>
+        <div className="ad__toast">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M20 6L9 17l-5-5" />
+          </svg>
+          {successMessage}
+        </div>
       )}
 
-      {/* Actions bar */}
-      <div className="ad-actions-bar">
-        <h2 className="ad-section-title">Transacciones</h2>
-        <div className="ad-actions-bar__buttons">
-          <button
-            className="btn ad-btn--charge"
-            onClick={() => openForm("charge")}
-            type="button"
-          >
-            <span className="ad-btn-icon">↓</span>
-            Cobrar
-          </button>
-          <button
-            className="btn ad-btn--pay"
-            onClick={() => openForm("pay")}
-            type="button"
-          >
-            <span className="ad-btn-icon">↑</span>
-            Pagar
-          </button>
+      {/* ─── Transactions section ─── */}
+      <div className="ad__tx-section">
+        <div className="ad__tx-header">
+          <h2 className="ad__tx-title">Historial de movimientos</h2>
+          <span className="ad__tx-count">{transactions.length} registros</span>
         </div>
-      </div>
 
-      {/* Transaction list */}
-      {transactions.length === 0 ? (
-        <div className="ad-empty">
-          <div className="ad-empty__icon">💸</div>
-          <h3>Sin transacciones</h3>
-          <p>Aún no hay transacciones registradas para esta actividad.</p>
-        </div>
-      ) : (
-        <div className="ad-tx-list">
-          {transactions.map((tx) => {
-            const isIncome = tx.type === "DEPOSIT" || tx.type === "REFUND";
-            return (
-              <article
-                key={tx.id}
-                className={`ad-tx-card ${isIncome ? "ad-tx-card--income" : "ad-tx-card--expense"}`}
-              >
-                <div className="ad-tx-card__left">
-                  <div className={`ad-tx-card__type-icon ${isIncome ? "is-income" : "is-expense"}`}>
+        {transactions.length === 0 ? (
+          <div className="ad__tx-empty">
+            <div className="ad__tx-empty-visual">
+              <div className="ad__tx-empty-circle">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <path d="M9 12h6M12 9v6" />
+                </svg>
+              </div>
+            </div>
+            <h3>Sin movimientos aún</h3>
+            <p>Registra tu primer cobro o pago para comenzar a ver el historial.</p>
+            <div className="ad__tx-empty-actions">
+              <button className="ad__action-btn ad__action-btn--charge" onClick={() => openForm("charge")} type="button">
+                <div className="ad__action-btn-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 5v14M5 12h14" />
+                  </svg>
+                </div>
+                <span>Primer cobro</span>
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="ad__tx-list">
+            {transactions.map((tx) => {
+              const isIncome = tx.type === "DEPOSIT" || tx.type === "REFUND";
+              return (
+                <div key={tx.id} className="ad__tx-row">
+                  <div className={`ad__tx-indicator ${isIncome ? "is-income" : "is-expense"}`}>
                     {TYPE_ICONS[tx.type] || "•"}
                   </div>
-                  <div className="ad-tx-card__info">
-                    <span className="ad-tx-card__name">{tx.nameCuate}</span>
-                    <span className="ad-tx-card__meta">
-                      <span className="ad-tx-card__type-label">{TYPE_LABELS[tx.type]}</span>
-                      {tx.description && <> · {tx.description}</>}
-                    </span>
-                    <span className="ad-tx-card__date">{formatDate(tx.date)}</span>
+                  <div className="ad__tx-body">
+                    <div className="ad__tx-primary">
+                      <span className="ad__tx-name">{tx.nameCuate}</span>
+                      <span className={`ad__tx-amount ${isIncome ? "is-income" : "is-expense"}`}>
+                        {isIncome ? "+" : "−"}{formatMoney(tx.amount)}
+                      </span>
+                    </div>
+                    <div className="ad__tx-secondary">
+                      <span className="ad__tx-type">{TYPE_LABELS[tx.type]}</span>
+                      {tx.description && <span className="ad__tx-desc"> · {tx.description}</span>}
+                      <span className="ad__tx-time">{formatShortDate(tx.date)}</span>
+                    </div>
                   </div>
-                </div>
-                <div className="ad-tx-card__right">
-                  <span className={`ad-tx-card__amount ${isIncome ? "is-income" : "is-expense"}`}>
-                    {isIncome ? "+" : "-"}{formatMoney(tx.amount)}
-                  </span>
-                  <span className={`ad-tx-card__status ad-tx-card__status--${tx.status.toLowerCase()}`}>
+                  <span className={`ad__tx-status ad__tx-status--${tx.status.toLowerCase()}`}>
                     {STATUS_LABELS[tx.status]}
                   </span>
                 </div>
-              </article>
-            );
-          })}
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* ─── QR Full-screen Modal ─── */}
+      {showQrModal && (
+        <div className="ad__overlay" onClick={() => setShowQrModal(false)}>
+          <div className="ad__qr-modal" onClick={(e) => e.stopPropagation()}>
+            <button className="ad__qr-modal-close" onClick={() => setShowQrModal(false)} type="button">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M18 6L6 18M6 6l12 12" />
+              </svg>
+            </button>
+            <div className="ad__qr-modal-content">
+              <img src="/qr_bueno.png" alt="Código QR BancoFie" className="ad__qr-modal-img" />
+              <div className="ad__qr-modal-info">
+                <h3>{activity.name}</h3>
+                <p>Escanea este código QR con tu app de BancoFie para realizar un pago</p>
+                <span className="ad__qr-modal-amount">Saldo: {formatMoney(balance)}</span>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
-      {/* New Transaction Modal */}
+      {/* ─── Transaction Form Modal ─── */}
       {showForm && (
-        <div className="modal-overlay" onClick={() => setShowForm(false)}>
-          <div
-            className="modal ad-modal"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="modal__header">
-              <div className="ad-modal__title-group">
-                <span className={`ad-modal__mode-badge ${formMode === "pay" ? "is-pay" : "is-charge"}`}>
-                  {formMode === "pay" ? "↑ Pago" : "↓ Cobro"}
-                </span>
-                <h3>
-                  {formMode === "pay"
-                    ? "Registrar pago"
-                    : "Registrar cobro"}
-                </h3>
+        <div className="ad__overlay" onClick={() => setShowForm(false)}>
+          <div className="ad__form-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="ad__form-header">
+              <div className="ad__form-header-left">
+                <div className={`ad__form-mode-icon ${formMode === "pay" ? "is-pay" : "is-charge"}`}>
+                  {formMode === "pay" ? (
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M5 12h14M12 5l7 7-7 7" />
+                    </svg>
+                  ) : (
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M12 5v14M5 12h14" />
+                    </svg>
+                  )}
+                </div>
+                <div>
+                  <h3>{formMode === "pay" ? "Registrar pago" : "Registrar cobro"}</h3>
+                  <span className="ad__form-subtitle">{activity.name}</span>
+                </div>
               </div>
-              <button
-                className="modal__close"
-                onClick={() => setShowForm(false)}
-                type="button"
-              >
-                ×
+              <button className="ad__form-close" onClick={() => setShowForm(false)} type="button">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M18 6L6 18M6 6l12 12" />
+                </svg>
               </button>
             </div>
-            <form onSubmit={handleSubmit}>
-              <div className="form-group">
-                <label htmlFor="tx-name">Nombre *</label>
-                <input
-                  id="tx-name"
-                  type="text"
-                  value={formData.nameCuate}
-                  onChange={(e) =>
-                    setFormData({ ...formData, nameCuate: e.target.value })
-                  }
-                  required
-                  placeholder="Ej: Juan Pérez"
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="tx-amount">Monto (Bs) *</label>
-                <input
-                  id="tx-amount"
-                  type="number"
-                  step="0.01"
-                  min="0.01"
-                  value={formData.amount}
-                  onChange={(e) =>
-                    setFormData({ ...formData, amount: e.target.value })
-                  }
-                  required
-                  placeholder="0.00"
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="tx-type">Tipo *</label>
-                <select
-                  id="tx-type"
-                  value={formData.type}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      type: e.target.value as TransactionForm["type"],
-                    })
-                  }
-                >
-                  {formMode === "charge" ? (
-                    <>
-                      <option value="DEPOSIT">Depósito</option>
-                      <option value="REFUND">Reembolso</option>
-                    </>
-                  ) : (
-                    <>
-                      <option value="PAYMENT">Pago</option>
-                      <option value="WITHDRAWAL">Retiro</option>
-                      <option value="TRANSFER">Transferencia</option>
-                    </>
-                  )}
-                </select>
-              </div>
-              <div className="form-group">
-                <label htmlFor="tx-description">Descripción</label>
-                <textarea
-                  id="tx-description"
-                  value={formData.description}
-                  onChange={(e) =>
-                    setFormData({ ...formData, description: e.target.value })
-                  }
-                  placeholder="Descripción opcional..."
-                  rows={2}
-                />
-              </div>
-              <div className="ad-form-row">
-                <div className="form-group">
-                  <label htmlFor="tx-bank">Banco</label>
+
+            <form className="ad__form-body" onSubmit={handleSubmit}>
+              {/* Amount — big and prominent */}
+              <div className="ad__form-amount-section">
+                <label htmlFor="tx-amount">Monto (Bs)</label>
+                <div className="ad__form-amount-input">
+                  <span className="ad__form-currency">Bs</span>
                   <input
-                    id="tx-bank"
-                    type="text"
-                    value={formData.bankName}
-                    onChange={(e) =>
-                      setFormData({ ...formData, bankName: e.target.value })
-                    }
-                    placeholder="Ej: BancoFIE"
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="tx-account">Nro. Cuenta</label>
-                  <input
-                    id="tx-account"
-                    type="text"
-                    value={formData.accountNumber}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        accountNumber: e.target.value,
-                      })
-                    }
-                    placeholder="Ej: 123456789"
+                    id="tx-amount"
+                    type="number"
+                    step="0.01"
+                    min="0.01"
+                    value={formData.amount}
+                    onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                    required
+                    placeholder="0.00"
+                    autoFocus
                   />
                 </div>
               </div>
-              <div className="modal__actions">
-                <button
-                  type="button"
-                  className="btn btn--secondary"
-                  onClick={() => setShowForm(false)}
-                >
+
+              <div className="ad__form-fields">
+                <div className="ad__form-group">
+                  <label htmlFor="tx-name">Nombre del contacto *</label>
+                  <input
+                    id="tx-name"
+                    type="text"
+                    value={formData.nameCuate}
+                    onChange={(e) => setFormData({ ...formData, nameCuate: e.target.value })}
+                    required
+                    placeholder="Ej: Juan Pérez"
+                  />
+                </div>
+
+                <div className="ad__form-group">
+                  <label htmlFor="tx-type">Tipo de operación</label>
+                  <select
+                    id="tx-type"
+                    value={formData.type}
+                    onChange={(e) => setFormData({ ...formData, type: e.target.value as TransactionForm["type"] })}
+                  >
+                    {formMode === "charge" ? (
+                      <>
+                        <option value="DEPOSIT">Depósito</option>
+                        <option value="REFUND">Reembolso</option>
+                      </>
+                    ) : (
+                      <>
+                        <option value="PAYMENT">Pago</option>
+                        <option value="WITHDRAWAL">Retiro</option>
+                        <option value="TRANSFER">Transferencia</option>
+                      </>
+                    )}
+                  </select>
+                </div>
+
+                <div className="ad__form-group">
+                  <label htmlFor="tx-description">Nota (opcional)</label>
+                  <input
+                    id="tx-description"
+                    type="text"
+                    value={formData.description}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    placeholder="Concepto del movimiento"
+                  />
+                </div>
+
+                <div className="ad__form-row">
+                  <div className="ad__form-group">
+                    <label htmlFor="tx-bank">Banco</label>
+                    <input
+                      id="tx-bank"
+                      type="text"
+                      value={formData.bankName}
+                      onChange={(e) => setFormData({ ...formData, bankName: e.target.value })}
+                      placeholder="Ej: BancoFie"
+                    />
+                  </div>
+                  <div className="ad__form-group">
+                    <label htmlFor="tx-account">Nro. Cuenta</label>
+                    <input
+                      id="tx-account"
+                      type="text"
+                      value={formData.accountNumber}
+                      onChange={(e) => setFormData({ ...formData, accountNumber: e.target.value })}
+                      placeholder="123456789"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="ad__form-footer">
+                <button type="button" className="ad__form-btn ad__form-btn--cancel" onClick={() => setShowForm(false)}>
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className={`btn ${formMode === "pay" ? "ad-btn--pay" : "ad-btn--charge"}`}
+                  className={`ad__form-btn ${formMode === "pay" ? "ad__form-btn--pay" : "ad__form-btn--charge"}`}
                   disabled={submitting}
                 >
+                  {submitting ? (
+                    <span className="ad__form-btn-loading" />
+                  ) : null}
                   {submitting
                     ? "Procesando..."
                     : formMode === "pay"
-                      ? "Registrar pago"
-                      : "Registrar cobro"}
+                      ? "Confirmar pago"
+                      : "Confirmar cobro"}
                 </button>
               </div>
             </form>
