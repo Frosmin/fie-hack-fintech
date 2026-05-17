@@ -1,8 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { API_BASE } from "../../lib/api";
 import "./ActivityReport.css";
-
-const API_BASE = "http://localhost:3000/api";
 
 interface Activity {
   id: string;

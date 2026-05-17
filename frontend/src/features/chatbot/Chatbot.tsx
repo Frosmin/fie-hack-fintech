@@ -4,9 +4,10 @@ import pigHappy from "../../assets/character/pig-happy.webp";
 import pigNeutral from "../../assets/character/pig-neutral.webp";
 import pigPensante from "../../assets/character/pig-pensante.webp";
 import pigSad from "../../assets/character/pig-sad.webp";
+import { apiUrl } from "../../lib/api";
 import "./Chatbot.css";
 
-const API_URL = "http://localhost:3000/api/chatbot/message";
+const API_URL = apiUrl("/chatbot/message");
 
 type ChatRole = "user" | "assistant";
 type AssistantMood = "neutral" | "thinking" | "happy" | "sad";

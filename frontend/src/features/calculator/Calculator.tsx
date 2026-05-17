@@ -1,4 +1,5 @@
 import { useState, type ReactNode } from "react";
+import { API_BASE } from "../../lib/api";
 import "./Calculator.css";
 
 /* ─── SVG Icons ───────────────────────────────────────────────────── */
@@ -231,8 +232,6 @@ const QUICK_TIPS = [
     description: "Ajusta precios y costos según la respuesta real del mercado.",
   },
 ];
-
-const API_BASE = "http://localhost:3000/api";
 
 /* ─── Helpers ─────────────────────────────────────────────────────── */
 

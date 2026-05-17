@@ -1,8 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { API_BASE as API } from "../../lib/api";
 import "./BusinessReport.css";
-
-const API = "http://localhost:3000/api";
 
 interface Business { id: string; name: string; description: string | null; BusinessMoney: string; isActive: boolean; createdAt: string; }
 interface Activity { id: string; name: string; description: string | null; activityMoney: string; isActive: boolean; businessId: string; }

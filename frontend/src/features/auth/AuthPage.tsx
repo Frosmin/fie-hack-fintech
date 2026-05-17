@@ -1,9 +1,10 @@
 import { useState, useCallback, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import brandIcon from "../../assets/logo/logo-text-fie-white.webp";
+import { apiUrl } from "../../lib/api";
 import "./AuthPage.css";
 
-const API_URL = "http://localhost:3000/api/auth";
+const API_URL = apiUrl("/auth");
 
 interface AuthUser {
   id: string;

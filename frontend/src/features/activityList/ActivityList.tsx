@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+import { apiUrl } from "../../lib/api";
 import "./ActivityList.css";
 
 interface BusinessData {
@@ -36,8 +37,8 @@ interface ActivityListProps {
   onBack: () => void;
 }
 
-const ACTIVITY_API_URL = "http://localhost:3000/api/activities";
-const BUSINESS_API_URL = "http://localhost:3000/api/business";
+const ACTIVITY_API_URL = apiUrl("/activities");
+const BUSINESS_API_URL = apiUrl("/business");
 
 function formatMoney(value: string | number) {
   const num = typeof value === "string" ? parseFloat(value) : value;

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import "./Business.css";
 import { ActivityList } from "../activityList/ActivityList";
+import { apiUrl } from "../../lib/api";
 
 interface BusinessData {
   id: number;
@@ -23,7 +24,7 @@ interface BusinessFormData {
   phone: string;
 }
 
-const API_URL = "http://localhost:3000/api/business";
+const API_URL = apiUrl("/business");
 
 export function Business() {
   const [businesses, setBusinesses] = useState<BusinessData[]>([]);

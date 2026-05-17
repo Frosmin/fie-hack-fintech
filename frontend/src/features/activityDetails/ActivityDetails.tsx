@@ -1,9 +1,8 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx";
+import { API_BASE } from "../../lib/api";
 import "./ActivityDetails.css";
-
-const API_BASE = "http://localhost:3000/api";
 
 interface Activity {
   id: string;
@@ -295,7 +294,7 @@ export function ActivityDetails() {
           return;
         }
 
-        const parsedData = rows.map((row, index) => {
+        const parsedData = rows.map((row) => {
           const getValue = (header: string) => {
             const colIndex = normalizedHeaders.indexOf(header);
             return colIndex >= 0 ? row[colIndex] : undefined;
@@ -309,7 +308,6 @@ export function ActivityDetails() {
           const accountNumber = getValue("accountnumber")?.toString() || "";
 
           const typeTranslation: Record<string, string> = {
-            deposito: "DEPOSIT",
             deposito: "DEPOSIT",
             depósito: "DEPOSIT",
             reembolso: "REFUND",
