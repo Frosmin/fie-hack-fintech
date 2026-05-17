@@ -70,18 +70,7 @@
   left: 0;
   right: 0;
   height: 2px;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(68, 194, 244, 0.5) 15%,
-    rgba(238, 0, 138, 0.6) 35%,
-    rgba(0, 91, 167, 0.5) 55%,
-    rgba(238, 0, 138, 0.6) 75%,
-    rgba(68, 194, 244, 0.5) 90%,
-    transparent 100%
-  );
-  background-size: 200% 100%;
-  animation: navGlow 6s ease infinite;
+  background: #c91d63;
   border-radius: 0 0 2px 2px;
   opacity: 0.75;
 }
@@ -137,10 +126,7 @@
   font-size: 0.92rem;
   line-height: 1.25;
   font-weight: 700;
-  background: linear-gradient(135deg, #1f3471, #005ba7);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #2b4382;
 }
 
 /* ─── Hamburger toggle ─── */
@@ -278,7 +264,7 @@
   width: 18px;
   height: 3px;
   border-radius: 3px;
-  background: linear-gradient(90deg, #ee008a, #005ba7);
+  background: #c91d63;
   animation: tabUnderline 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
@@ -322,13 +308,13 @@
   width: 36px;
   height: 36px;
   border-radius: 12px;
-  background: linear-gradient(135deg, #ee008a 0%, #c91876 50%, #005ba7 100%);
+  background: #c91d63;
   color: #ffffff;
   font-size: 0.78rem;
   font-weight: 700;
   letter-spacing: 0.06em;
   transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-  box-shadow: 0 2px 8px rgba(238, 0, 138, 0.2);
+  box-shadow: 0 2px 8px rgba(201, 29, 99, 0.2);
 }
 
 .navbar__avatar-btn:hover .navbar__avatar {

@@ -87,7 +87,7 @@
   width: 48px;
   height: 48px;
   border-radius: 10px;
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background: #c91d63;
   color: #ffffff;
   font-size: 1.2rem;
   font-weight: 700;
