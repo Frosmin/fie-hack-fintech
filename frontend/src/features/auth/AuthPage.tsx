@@ -1,27 +1,20 @@
-import { useState, useCallback, type FormEvent } from "react";
-import brandIcon from "../../assets/icon.webp";
-import "./AuthPage.css";
+import { useState, useCallback, type FormEvent } from "react"
+import { useNavigate } from "react-router-dom"
+import brandIcon from "../../assets/icon.webp"
+import "./AuthPage.css"
 
-const API_URL = "http://localhost:3000/api/auth";
+const API_URL = "http://localhost:3000/api/auth"
 
-/* ─── Types ─── */
 interface AuthUser {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
+  id: string
+  name: string
+  email: string
+  role: string
 }
 
-interface AuthResponse {
-  token: string;
-  user: AuthUser;
-}
 
-export interface AuthPageProps {
-  onLogin: (token: string, user: AuthUser) => void;
-}
 
-type Mode = "login" | "register";
+type Mode = "login" | "register"
 
 /* ─── Password Strength ─── */
 function getPasswordStrength(pw: string) {
@@ -101,7 +94,8 @@ function IconArrow() {
 }
 
 /* ─── Main Component ─── */
-export function AuthPage({ onLogin }: AuthPageProps) {
+export function AuthPage() {
+  const navigate = useNavigate()
   const [mode, setMode] = useState<Mode>("login");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -175,8 +169,10 @@ export function AuthPage({ onLogin }: AuthPageProps) {
         return;
       }
 
-      const { token, user } = data as AuthResponse;
-      onLogin(token, user);
+      const { token, user } = data as { token: string; user: AuthUser }
+      localStorage.setItem("auth_token", token)
+      localStorage.setItem("auth_user", JSON.stringify(user))
+      navigate("/", { replace: true })
     } catch {
       setError("No se pudo conectar con el servidor");
     } finally {

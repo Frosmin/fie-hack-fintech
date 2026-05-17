@@ -7,7 +7,7 @@ import {
 import { authRequired } from "../middlewares/auth.middleware.js";
 import { authLimiter } from "../middlewares/rateLimiter.middleware.js";
 
-const router = Router();
+const router: Router = Router();
 
 router.post("/register", registerUser);
 router.post("/login", authLimiter, loginUser);
