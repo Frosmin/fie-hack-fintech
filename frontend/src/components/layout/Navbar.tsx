@@ -1,38 +1,30 @@
-<<<<<<< HEAD
 import { useState } from "react";
 import "./Navbar.css";
-import brandIcon from "../../assets/logo-tinka.webp";
-
-export type AppView = "dashboard" | "sales" | "calculator" | "chatbot";
-=======
-import { useState } from "react"
-import { Link, useLocation } from "react-router-dom"
-import "./Navbar.css"
-import brandIcon from "../../assets/icon.webp"
->>>>>>> 2b10a098dbc1962d7e18689135ee38a2425ad5a5
+import brandIcon from "../../assets/logo/logo-tinka.webp";
+import { Link, useLocation } from "react-router-dom";
 
 const navigation = [
   { id: "dashboard", label: "Dashboard", path: "/" },
   { id: "business", label: "Mis negocios", path: "/business" },
   { id: "calculator", label: "Calculadora IA", path: "/calculator" },
   { id: "chatbot", label: "Chatbot", path: "/chatbot" },
-] as const
+] as const;
 
-export type AppView = "dashboard" | "business" | "calculator" | "chatbot"
+export type AppView = "dashboard" | "business" | "calculator" | "chatbot";
 
 interface NavbarProps {
-  user?: { name: string; email: string; role: string } | null
-  onLogout?: () => void
+  user?: { name: string; email: string; role: string } | null;
+  onLogout?: () => void;
 }
 
 export function Navbar({ user, onLogout }: NavbarProps) {
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
-  const location = useLocation()
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const location = useLocation();
 
   const handleNavClick = () => {
-    setIsMenuOpen(false)
-  }
+    setIsMenuOpen(false);
+  };
 
   const initials = user?.name
     ? user.name
@@ -41,7 +33,7 @@ export function Navbar({ user, onLogout }: NavbarProps) {
         .map((w) => w[0])
         .join("")
         .toUpperCase()
-    : "?"
+    : "?";
 
   return (
     <header className="navbar">
@@ -134,8 +126,8 @@ export function Navbar({ user, onLogout }: NavbarProps) {
                   type="button"
                   className="navbar__dropdown-item navbar__dropdown-item--danger"
                   onClick={() => {
-                    setIsUserMenuOpen(false)
-                    onLogout?.()
+                    setIsUserMenuOpen(false);
+                    onLogout?.();
                   }}
                 >
                   <svg
@@ -160,5 +152,5 @@ export function Navbar({ user, onLogout }: NavbarProps) {
         </div>
       )}
     </header>
-  )
+  );
 }
