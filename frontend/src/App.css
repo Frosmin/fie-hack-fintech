@@ -1,10 +1,8 @@
 .app-shell {
   position: relative;
   min-height: 100svh;
-  padding: 24px;
-  padding-top: 0px;
   box-sizing: border-box;
-  background: linear-gradient(180deg, #ffffff 0%, #f7f9fe 100%);
+  background: var(--bg);
 }
 
 .app-shell::before,
@@ -123,6 +121,7 @@
 
 .app-view {
   min-width: 0;
+  padding: 12px 36px;
 }
 
 @media (max-width: 1080px) {

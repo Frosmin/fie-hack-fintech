@@ -1,6 +1,6 @@
 import { useState, useCallback, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
-import brandIcon from "../../assets/icon.webp";
+import brandIcon from "../../assets/logo/logo-text-fie-white.webp";
 import "./AuthPage.css";
 
 const API_URL = "http://localhost:3000/api/auth";
@@ -28,7 +28,6 @@ function getPasswordStrength(pw: string) {
   return { level: "strong", label: "Fuerte", bars: 5 };
 }
 
-/* ─── SVG Icons ─── */
 function IconMail() {
   return (
     <svg
@@ -139,7 +138,6 @@ function IconArrow() {
   );
 }
 
-/* ─── Main Component ─── */
 export function AuthPage() {
   const navigate = useNavigate();
   const [mode, setMode] = useState<Mode>("login");
@@ -159,7 +157,6 @@ export function AuthPage() {
     setFieldErrors({});
   }, []);
 
-  /* ─── Validation ─── */
   function validate(): boolean {
     const errs: Record<string, string> = {};
 
@@ -187,7 +184,6 @@ export function AuthPage() {
     return Object.keys(errs).length === 0;
   }
 
-  /* ─── Submit ─── */
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     if (!validate()) return;
@@ -215,6 +211,7 @@ export function AuthPage() {
         return;
       }
 
+      navigate("/", { replace: true });
       const { token, user } = data as { token: string; user: AuthUser };
       localStorage.setItem("auth_token", token);
       localStorage.setItem("auth_user", JSON.stringify(user));
@@ -230,7 +227,6 @@ export function AuthPage() {
 
   return (
     <div className="auth-page">
-      {/* ─── Left Panel ─── */}
       <div className="auth-panel">
         <div className="auth-panel__orb auth-panel__orb--1" />
         <div className="auth-panel__orb auth-panel__orb--2" />
@@ -242,12 +238,9 @@ export function AuthPage() {
             src={brandIcon}
             alt="Tinka Emprende Hub"
           />
-          <h1 className="auth-panel__title">
-            Comunidad <span>Tinka</span>
-          </h1>
           <p className="auth-panel__subtitle">
             Impulsa tu emprendimiento con herramientas inteligentes de gestión
-            financiera y ventas.
+            financiera y ventas. Unete a Tinka.
           </p>
 
           <div className="auth-panel__features">
@@ -270,7 +263,6 @@ export function AuthPage() {
         </div>
       </div>
 
-      {/* ─── Right Panel ─── */}
       <div className="auth-form-panel">
         <div className="auth-card" key={mode}>
           <div className="auth-card__header">
@@ -278,6 +270,7 @@ export function AuthPage() {
               {mode === "login" ? "Bienvenido" : "Empieza ahora"}
             </div>
             <h2 className="auth-card__title">
+              {mode === "login" ? "Inicia sesión" : "Crea tu cuenta"}
               {mode === "login" ? "Inicia sesión" : "Crea tu cuenta"}
             </h2>
             <p className="auth-card__desc">
@@ -287,7 +280,6 @@ export function AuthPage() {
             </p>
           </div>
 
-          {/* ─── Error Alert ─── */}
           {error && (
             <div className="auth-alert" role="alert">
               <IconAlert />
@@ -295,9 +287,7 @@ export function AuthPage() {
             </div>
           )}
 
-          {/* ─── Form ─── */}
           <form className="auth-form" onSubmit={handleSubmit} noValidate>
-            {/* Name (register only) */}
             {mode === "register" && (
               <div className="auth-field">
                 <label className="auth-field__label" htmlFor="auth-name">
@@ -324,7 +314,6 @@ export function AuthPage() {
               </div>
             )}
 
-            {/* Email */}
             <div className="auth-field">
               <label className="auth-field__label" htmlFor="auth-email">
                 Correo electrónico
