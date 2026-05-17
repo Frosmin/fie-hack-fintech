@@ -2,6 +2,7 @@ import type { NextFunction, Request, Response } from "express";
 import * as authService from "../services/auth.service.js";
 import AppError from "../errors/appError.js";
 import { serializeBigInt } from "../helpers/serialize.helper.js";
+import type { AuthenticatedRequest } from "../types/authenticated-request.js";
 
 export async function registerUser(
   req: Request,
@@ -39,7 +40,7 @@ export async function loginUser(
   }
 }
 
-export async function getMe(req: Request, res: Response, next: NextFunction) {
+export async function getMe(req: AuthenticatedRequest, res: Response, next: NextFunction) {
   try {
     const user = req.user;
     if (!user) {

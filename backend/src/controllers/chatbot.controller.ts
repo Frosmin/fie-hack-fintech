@@ -1,10 +1,11 @@
-import type { NextFunction, Request, Response } from "express";
+import type { NextFunction, Response } from "express";
 import AppError from "../errors/appError.js";
 import { chatbotMessageSchema } from "../schemas/chatbot.schema.js";
 import * as chatbotService from "../services/chatbot.service.js";
+import type { AuthenticatedRequest } from "../types/authenticated-request.js";
 
 export async function sendChatbotMessage(
-  req: Request,
+  req: AuthenticatedRequest,
   res: Response,
   next: NextFunction,
 ) {
