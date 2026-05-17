@@ -24,7 +24,7 @@ const initialMessages: ChatMessage[] = [
     id: "welcome",
     role: "assistant",
     content:
-      "Puedo ayudarte a analizar tus negocios, actividades, productos, ventas y transacciones con los datos que ya registraste.",
+      "¡Hola! Soy tu asistente inteligente. Puedo ayudarte a analizar tus negocios, actividades, productos, ventas y transacciones con los datos que ya registraste. ¿En qué te puedo ayudar hoy?",
   },
 ];
 
@@ -34,6 +34,69 @@ function createMessage(role: ChatRole, content: string): ChatMessage {
     role,
     content,
   };
+}
+
+/* ── Inline SVG icons ── */
+
+function SparklesIcon({ size = 22 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 3l1.912 5.813a2 2 0 0 0 1.275 1.275L21 12l-5.813 1.912a2 2 0 0 0-1.275 1.275L12 21l-1.912-5.813a2 2 0 0 0-1.275-1.275L3 12l5.813-1.912a2 2 0 0 0 1.275-1.275L12 3z" />
+    </svg>
+  );
+}
+
+function SendIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M22 2L11 13" />
+      <path d="M22 2l-7 20-4-9-9-4 20-7z" />
+    </svg>
+  );
+}
+
+function LightbulbIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M9 18h6" />
+      <path d="M10 22h4" />
+      <path d="M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2z" />
+    </svg>
+  );
+}
+
+function ShieldIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+    </svg>
+  );
+}
+
+function EyeIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+      <circle cx="12" cy="12" r="3" />
+    </svg>
+  );
+}
+
+function ArrowIcon() {
+  return (
+    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M5 12h14" />
+      <path d="M12 5l7 7-7 7" />
+    </svg>
+  );
+}
+
+function BotAvatar() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 3l1.912 5.813a2 2 0 0 0 1.275 1.275L21 12l-5.813 1.912a2 2 0 0 0-1.275 1.275L12 21l-1.912-5.813a2 2 0 0 0-1.275-1.275L3 12l5.813-1.912a2 2 0 0 0 1.275-1.275L12 3z" />
+    </svg>
+  );
 }
 
 export function Chatbot() {
@@ -109,30 +172,42 @@ export function Chatbot() {
 
   return (
     <section className="chatbot">
-      <div className="section-heading">
-        <div>
-          <span className="section-heading__eyebrow">Asistente IA</span>
-          <h2>Chatbot de negocio</h2>
+      {/* ── Hero header ── */}
+      <div className="chat-hero">
+        <div className="chat-hero__top">
+          <div className="chat-hero__icon">
+            <SparklesIcon size={24} />
+          </div>
+          <div className="chat-hero__label">
+            <span className="chat-hero__badge">Inteligencia Artificial · Activa</span>
+            <h2>Tinka IA</h2>
+          </div>
         </div>
-        <p>
-          Consulta tus negocios, actividades, productos, ventas y transacciones
-          con respuestas basadas en tus registros.
+        <p className="chat-hero__desc">
+          Tu asistente inteligente para consultar negocios, actividades, productos, ventas y transacciones con respuestas basadas en tus registros.
         </p>
       </div>
 
+      {/* ── Main grid ── */}
       <div className="chatbot__grid">
-        <article className="panel chat-panel">
-          <div className="panel__header">
-            <div>
-              <span className="panel__eyebrow">Conversacion</span>
-              <h3>Asistente Tinka</h3>
+        {/* ── Chat panel ── */}
+        <article className="chat-panel">
+          <div className="chat-panel__header">
+            <div className="chat-panel__header-left">
+              <div className="chat-panel__avatar">
+                <BotAvatar />
+              </div>
+              <div className="chat-panel__title-group">
+                <span className="chat-panel__title">Asistente Tinka</span>
+                <span className="chat-panel__subtitle">Analisis inteligente de tu negocio</span>
+              </div>
             </div>
-            <span className="panel__badge">Gemini 2.5</span>
+            <span className="chat-panel__model-badge">✦ Gemini 2.5</span>
           </div>
 
           <div
             className="chat-panel__messages"
-            aria-label="Mensajes del chatbot"
+            aria-label="Mensajes del asistente"
             aria-live="polite"
           >
             {messages.map((message) => (
@@ -140,18 +215,34 @@ export function Chatbot() {
                 key={message.id}
                 className={`chat-message chat-message--${message.role}`}
               >
-                <strong>{message.role === "assistant" ? "Asistente" : "Tu"}</strong>
-                <p>{message.content}</p>
+                <div className="chat-message__avatar">
+                  {message.role === "assistant" ? (
+                    <BotAvatar />
+                  ) : (
+                    "Tu"
+                  )}
+                </div>
+                <div className="chat-message__bubble">
+                  <span className="chat-message__name">
+                    {message.role === "assistant" ? "Tinka IA" : "Tu"}
+                  </span>
+                  <p className="chat-message__text">{message.content}</p>
+                </div>
               </div>
             ))}
 
             {loading && (
               <div className="chat-message chat-message--assistant">
-                <strong>Asistente</strong>
-                <div className="typing-indicator" aria-label="Generando respuesta">
-                  <span />
-                  <span />
-                  <span />
+                <div className="chat-message__avatar">
+                  <BotAvatar />
+                </div>
+                <div className="chat-message__bubble">
+                  <span className="chat-message__name">Tinka IA</span>
+                  <div className="typing-indicator" aria-label="Generando respuesta">
+                    <span />
+                    <span />
+                    <span />
+                  </div>
                 </div>
               </div>
             )}
@@ -161,68 +252,84 @@ export function Chatbot() {
 
           {error && (
             <div className="chat-panel__error" role="alert">
-              {error}
+              ⚠ {error}
             </div>
           )}
 
           <form className="chat-panel__composer" onSubmit={handleSubmit}>
-            <input
-              type="text"
-              value={input}
-              onChange={(event) => setInput(event.target.value)}
-              placeholder="Pregunta sobre tus negocios o ventas"
-              disabled={loading}
-              maxLength={1000}
-            />
+            <div className="chat-panel__input-wrap">
+              <input
+                type="text"
+                value={input}
+                onChange={(event) => setInput(event.target.value)}
+                placeholder="Escribe tu pregunta sobre negocios, ventas o productos..."
+                disabled={loading}
+                maxLength={1000}
+              />
+            </div>
             <button
               type="submit"
-              className="primary-action"
+              className="chat-panel__send-btn"
               disabled={loading || input.trim().length === 0}
             >
-              {loading ? "Enviando..." : "Enviar"}
+              <SendIcon />
+              {loading ? "Analizando..." : "Enviar"}
             </button>
           </form>
         </article>
 
-        <article className="panel chat-panel__side">
-          <div className="panel__header">
-            <div>
-              <span className="panel__eyebrow">Sugerencias</span>
-              <h3>Preguntas rapidas</h3>
+        {/* ── Sidebar ── */}
+        <aside className="chat-sidebar">
+          {/* Suggestions */}
+          <div className="suggestion-card">
+            <div className="suggestion-card__header">
+              <div className="suggestion-card__header-icon">
+                <LightbulbIcon />
+              </div>
+              <span className="suggestion-card__title">Preguntas sugeridas</span>
+            </div>
+            <div className="suggestion-list">
+              {suggestions.map((item) => (
+                <button
+                  key={item}
+                  type="button"
+                  className="suggestion-chip"
+                  onClick={() => setInput(item)}
+                  disabled={loading}
+                >
+                  <span>{item}</span>
+                  <span className="suggestion-chip__arrow">
+                    <ArrowIcon />
+                  </span>
+                </button>
+              ))}
             </div>
           </div>
 
-          <div className="suggestion-list">
-            {suggestions.map((item) => (
-              <button
-                key={item}
-                type="button"
-                className="suggestion-chip"
-                onClick={() => setInput(item)}
-                disabled={loading}
-              >
-                {item}
-              </button>
-            ))}
-          </div>
-
+          {/* Tips */}
           <div className="assistant-tips">
-            <article>
-              <span>Contexto</span>
+            <article className="tip-card">
+              <span className="tip-card__label tip-card__label--context">
+                <ShieldIcon />
+                Contexto
+              </span>
               <p>
                 Las respuestas usan un resumen de tus datos registrados, no
                 informacion de otros usuarios.
               </p>
             </article>
-            <article>
-              <span>Alcance</span>
+            <article className="tip-card">
+              <span className="tip-card__label tip-card__label--scope">
+                <EyeIcon />
+                Alcance
+              </span>
               <p>
                 El asistente solo consulta y analiza. No crea, edita ni elimina
                 registros.
               </p>
             </article>
           </div>
-        </article>
+        </aside>
       </div>
     </section>
   );
