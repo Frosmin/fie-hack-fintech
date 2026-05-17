@@ -432,16 +432,16 @@ export function ActivityReport() {
             <div className="ar__bar-chart">
               {barData.map((d, i) => (
                 <div key={i} className="ar__bar-col">
-                  <div style={{ display: "flex", gap: 3, alignItems: "flex-end", height: "100%", width: "100%" }}>
+                  <div className="ar__bar-col-bars">
                     <div
                       className="ar__bar ar__bar--income"
-                      style={{ height: `${Math.max((d.income / barMax) * 100, 4)}%` }}
+                      style={{ height: `${Math.max((d.income / barMax) * 100, 6)}%` }}
                     >
                       <span className="ar__bar-tooltip">{formatMoney(d.income)}</span>
                     </div>
                     <div
                       className="ar__bar ar__bar--expense"
-                      style={{ height: `${Math.max((d.expense / barMax) * 100, 4)}%` }}
+                      style={{ height: `${Math.max((d.expense / barMax) * 100, 6)}%` }}
                     >
                       <span className="ar__bar-tooltip">{formatMoney(d.expense)}</span>
                     </div>
