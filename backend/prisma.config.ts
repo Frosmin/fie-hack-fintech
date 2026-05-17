@@ -3,12 +3,25 @@
 import "dotenv/config";
 import { defineConfig } from "prisma/config";
 
+// Evita errores de TypeScript al no estar cargado el entorno de tipos de Node
+declare const process: { argv: string[]; env: Record<string, string | undefined> };
+
+// Detecta si se está ejecutando una migración o comando CLI de base de datos
+const isMigration = process.argv.some(arg => 
+  arg.includes("migrate") || arg.includes("push") || arg.includes("pull") || arg.includes("studio")
+);
+
+const databaseUrl = isMigration 
+  ? (process.env["DIRECT_URL"] || process.env["DATABASE_URL"])
+  : process.env["DATABASE_URL"];
+
 export default defineConfig({
   schema: "prisma/schema.prisma",
   migrations: {
     path: "prisma/migrations",
   },
   datasource: {
-    url: process.env["DATABASE_URL"],
+    url: databaseUrl,
   },
 });
+
