@@ -62,6 +62,18 @@ export function ActivityList({ business, onBack }: ActivityListProps) {
   const [error, setError] = useState("");
   const [liveBizMoney, setLiveBizMoney] = useState<string>(business.BusinessMoney);
 
+  // Business edit/delete states
+  const [showBusinessModal, setShowBusinessModal] = useState(false);
+  const [businessForm, setBusinessForm] = useState({
+    name: business.name,
+    description: business.description || "",
+    address: business.address || "",
+    phone: business.phone || "",
+  });
+  const [submittingBusiness, setSubmittingBusiness] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deletingBusiness, setDeletingBusiness] = useState(false);
+
   // Compute business balance dynamically from activities
   const computedBalance = useMemo(() => {
     if (activities.length === 0) return parseFloat(liveBizMoney) || 0;
@@ -150,6 +162,47 @@ export function ActivityList({ business, onBack }: ActivityListProps) {
     }
   }
 
+  async function handleUpdateBusiness(e: React.FormEvent) {
+    e.preventDefault();
+    setSubmittingBusiness(true);
+    try {
+      const res = await fetch(`${BUSINESS_API_URL}/${business.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
+        },
+        body: JSON.stringify(businessForm),
+      });
+      if (!res.ok) throw new Error("Error");
+      const updatedBiz = await res.json();
+      localStorage.setItem("selected_business", JSON.stringify(updatedBiz));
+      window.location.reload();
+    } catch {
+      setError("No se pudo actualizar el negocio");
+      setSubmittingBusiness(false);
+    }
+  }
+
+  async function handleDeleteBusiness() {
+    setDeletingBusiness(true);
+    try {
+      const res = await fetch(`${BUSINESS_API_URL}/${business.id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
+        },
+      });
+      if (!res.ok) throw new Error("Error");
+      localStorage.removeItem("selected_business");
+      onBack();
+    } catch {
+      setError("No se pudo eliminar el negocio");
+      setDeletingBusiness(false);
+      setShowDeleteConfirm(false);
+    }
+  }
+
   return (
     <section className="al">
       {/* ── Back navigation ── */}
@@ -187,19 +240,40 @@ export function ActivityList({ business, onBack }: ActivityListProps) {
 
           {/* Right side: Balance + Report */}
           <div className="al__hero-right">
-            <button
-              className="al__report-btn"
-              onClick={() => navigate(`/business/${business.id}/report`)}
-              type="button"
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
-                <polyline points="14 2 14 8 20 8" />
-                <line x1="16" y1="13" x2="8" y2="13" />
-                <line x1="16" y1="17" x2="8" y2="17" />
-              </svg>
-              <span>Ver Reporte</span>
-            </button>
+            <div className="al__hero-actions">
+              <button
+                className="al__report-btn"
+                onClick={() => navigate(`/business/${business.id}/report`)}
+                type="button"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                  <polyline points="14 2 14 8 20 8" />
+                  <line x1="16" y1="13" x2="8" y2="13" />
+                  <line x1="16" y1="17" x2="8" y2="17" />
+                </svg>
+                <span>Ver Reporte</span>
+              </button>
+              <button
+                className="al__edit-btn"
+                onClick={() => {
+                  setBusinessForm({
+                    name: business.name,
+                    description: business.description || "",
+                    address: business.address || "",
+                    phone: business.phone || "",
+                  });
+                  setShowBusinessModal(true);
+                }}
+                type="button"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                </svg>
+                <span>Editar negocio</span>
+              </button>
+            </div>
             <div className={`al__balance-card ${computedBalance >= 0 ? "is-positive" : "is-negative"}`}>
               <span className="al__balance-label">Saldo negocio</span>
               <span className="al__balance-amount">{formatMoney(computedBalance)}</span>
@@ -401,6 +475,110 @@ export function ActivityList({ business, onBack }: ActivityListProps) {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Business Edit Modal */}
+      {showBusinessModal && (
+        <div className="al__overlay" onClick={() => setShowBusinessModal(false)}>
+          <div className="al__modal" onClick={(e) => e.stopPropagation()}>
+            <div className="al__modal-header">
+              <h3>Editar negocio</h3>
+              <button className="al__modal-close" onClick={() => setShowBusinessModal(false)}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M18 6L6 18M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <form onSubmit={handleUpdateBusiness} className="al__modal-form">
+              <div className="al__form-group">
+                <label htmlFor="biz-name">Nombre del negocio *</label>
+                <input
+                  id="biz-name"
+                  type="text"
+                  value={businessForm.name}
+                  onChange={(e) => setBusinessForm({ ...businessForm, name: e.target.value })}
+                  required
+                  placeholder="Ej: Mi Tienda"
+                />
+              </div>
+              <div className="al__form-group">
+                <label htmlFor="biz-desc">Descripcion</label>
+                <textarea
+                  id="biz-desc"
+                  value={businessForm.description}
+                  onChange={(e) => setBusinessForm({ ...businessForm, description: e.target.value })}
+                  placeholder="Describe tu negocio..."
+                  rows={3}
+                />
+              </div>
+              <div className="al__form-group">
+                <label htmlFor="biz-address">Direccion</label>
+                <input
+                  id="biz-address"
+                  type="text"
+                  value={businessForm.address}
+                  onChange={(e) => setBusinessForm({ ...businessForm, address: e.target.value })}
+                  placeholder="Ej: Av. Principal 123"
+                />
+              </div>
+              <div className="al__form-group">
+                <label htmlFor="biz-phone">Telefono</label>
+                <input
+                  id="biz-phone"
+                  type="tel"
+                  value={businessForm.phone}
+                  onChange={(e) => setBusinessForm({ ...businessForm, phone: e.target.value })}
+                  placeholder="Ej: 3001234567"
+                />
+              </div>
+              <div className="al__modal-actions">
+                {/* <button
+                  type="button"
+                  className="al__btn al__btn--danger"
+                  onClick={() => setShowDeleteConfirm(true)}
+                >
+                  Eliminar negocio
+                </button> */}
+                <div className="al__modal-actions-right">
+                  <button type="button" className="al__btn al__btn--cancel" onClick={() => setShowBusinessModal(false)}>
+                    Cancelar
+                  </button>
+                  <button type="submit" className="al__btn al__btn--primary" disabled={submittingBusiness}>
+                    {submittingBusiness ? "Guardando..." : "Guardar cambios"}
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="al__overlay" onClick={() => setShowDeleteConfirm(false)}>
+          <div className="al__modal al__modal--confirm" onClick={(e) => e.stopPropagation()}>
+            <div className="al__modal-header">
+              <h3>Eliminar negocio</h3>
+            </div>
+            <div className="al__modal-body">
+              <p>Estas seguro de eliminar <strong>{business.name}</strong>?</p>
+              <p className="al__warning">Esta accion no se puede deshacer. Perderas todas las actividades y movimientos asociados.</p>
+            </div>
+            <div className="al__modal-actions al__modal-actions--center">
+              <button type="button" className="al__btn al__btn--cancel" onClick={() => setShowDeleteConfirm(false)}>
+                Cancelar
+              </button>
+              <button
+                type="button"
+                className="al__btn al__btn--danger"
+                onClick={handleDeleteBusiness}
+                disabled={deletingBusiness}
+              >
+                {deletingBusiness ? "Eliminando..." : "Eliminar negocio"}
+              </button>
+            </div>
           </div>
         </div>
       )}

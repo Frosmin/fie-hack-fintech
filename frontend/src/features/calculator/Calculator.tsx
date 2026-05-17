@@ -379,10 +379,8 @@ export function Calculator() {
         <article className="panel">
           <div className="panel__header">
             <div>
-              <span className="panel__eyebrow">Datos del producto</span>
-              <h3>Completa la información</h3>
+              <h3>Datos del producto</h3>
             </div>
-            <span className="panel__badge">Paso 1</span>
           </div>
 
           <div className="calc-form__fields">
@@ -491,7 +489,7 @@ export function Calculator() {
               </span>
             </label>
 
-<label>
+            <label>
               Ventas estimadas por mes
               <input
                 id="calc-monthly-sales"
@@ -521,7 +519,7 @@ export function Calculator() {
               <span className="input-hint">
                 Maquinaria, materia prima inicial, diseno de marca, etc.
               </span>
-</label>
+            </label>
 
             {error && (
               <div className="calc-error">

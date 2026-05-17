@@ -112,17 +112,27 @@ export function ActivityDetails() {
   });
   const [successMessage, setSuccessMessage] = useState("");
   const [showImportModal, setShowImportModal] = useState(false);
-  const [importData, setImportData] = useState<Array<{
-    nameCuate: string;
-    amount: number;
-    type: string;
-    description: string;
-    bankName: string;
-    accountNumber: string;
-    error?: string;
-  }>>([]);
+  const [importData, setImportData] = useState<
+    Array<{
+      nameCuate: string;
+      amount: number;
+      type: string;
+      description: string;
+      bankName: string;
+      accountNumber: string;
+      error?: string;
+    }>
+  >([]);
   const [importing, setImporting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Activity edit states
+  const [showActivityEditModal, setShowActivityEditModal] = useState(false);
+  const [activityForm, setActivityForm] = useState({
+    name: "",
+    description: "",
+  });
+  const [submittingActivity, setSubmittingActivity] = useState(false);
 
   const token = localStorage.getItem("auth_token");
 
@@ -141,10 +151,9 @@ export function ActivityDetails() {
 
   const fetchTransactions = useCallback(async () => {
     try {
-      const res = await fetch(
-        `${API_BASE}/transactions?activityId=${id}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const res = await fetch(`${API_BASE}/transactions?activityId=${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       if (!res.ok) throw new Error("Error al cargar transacciones");
       const data = await res.json();
       setTransactions(data);
@@ -203,7 +212,7 @@ export function ActivityDetails() {
       setSuccessMessage(
         formMode === "pay"
           ? "¡Pago registrado exitosamente!"
-          : "¡Cobro registrado exitosamente!"
+          : "¡Cobro registrado exitosamente!",
       );
       setTimeout(() => setSuccessMessage(""), 4000);
     } catch {
@@ -223,15 +232,19 @@ export function ActivityDetails() {
         const data = new Uint8Array(event.target?.result as ArrayBuffer);
         const workbook = XLSX.read(data, { type: "array" });
         const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-        const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 }) as string[][];
+        const jsonData = XLSX.utils.sheet_to_json(firstSheet, {
+          header: 1,
+        }) as string[][];
 
         if (jsonData.length < 2) {
           alert("El archivo está vacío o no tiene datos");
           return;
         }
 
-        const headers = jsonData[0].map((h) => h?.toString().trim().toLowerCase() || "");
-        
+        const headers = jsonData[0].map(
+          (h) => h?.toString().trim().toLowerCase() || "",
+        );
+
         const headerMapping: Record<string, string> = {
           amount: "amount",
           monto: "amount",
@@ -257,15 +270,21 @@ export function ActivityDetails() {
         };
 
         const normalizedHeaders = headers.map((h) => headerMapping[h] || h);
-        
+
         const requiredHeaders = ["amount", "namecuate", "type"];
-        const missingHeaders = requiredHeaders.filter((h) => !normalizedHeaders.includes(h));
+        const missingHeaders = requiredHeaders.filter(
+          (h) => !normalizedHeaders.includes(h),
+        );
         if (missingHeaders.length > 0) {
           alert(`Faltan columnas requeridas: ${missingHeaders.join(", ")}`);
           return;
         }
 
-        const rows = jsonData.slice(1).filter((row) => row.some((cell) => cell !== undefined && cell !== ""));
+        const rows = jsonData
+          .slice(1)
+          .filter((row) =>
+            row.some((cell) => cell !== undefined && cell !== ""),
+          );
         if (rows.length === 0) {
           alert("No hay datos para importar");
           return;
@@ -308,16 +327,23 @@ export function ActivityDetails() {
           }
 
           let error: string | undefined;
-          const allowedTypes = formMode === "charge" 
-            ? ["DEPOSIT", "REFUND"] 
-            : ["PAYMENT", "WITHDRAWAL", "TRANSFER"];
+          const allowedTypes =
+            formMode === "charge"
+              ? ["DEPOSIT", "REFUND"]
+              : ["PAYMENT", "WITHDRAWAL", "TRANSFER"];
 
           if (!nameCuate || nameCuate.toString().trim() === "") {
             error = "Nombre requerido";
           } else if (!amount || isNaN(Number(amount)) || Number(amount) <= 0) {
             error = "Monto inválido";
-          } else if (!normalizedType || !allowedTypes.includes(normalizedType)) {
-            const validOpts = formMode === "charge" ? "Depósito, Reembolso (o DEPOSIT, REFUND)" : "Pago, Retiro, Transferencia (o PAYMENT, WITHDRAWAL, TRANSFER)";
+          } else if (
+            !normalizedType ||
+            !allowedTypes.includes(normalizedType)
+          ) {
+            const validOpts =
+              formMode === "charge"
+                ? "Depósito, Reembolso (o DEPOSIT, REFUND)"
+                : "Pago, Retiro, Transferencia (o PAYMENT, WITHDRAWAL, TRANSFER)";
             error = `Tipo inválido. Use: ${validOpts}`;
           }
 
@@ -400,12 +426,42 @@ export function ActivityDetails() {
     }
   }
 
+  async function handleUpdateActivity(e: React.FormEvent) {
+    e.preventDefault();
+    if (!id) return;
+    setSubmittingActivity(true);
+
+    try {
+      const res = await fetch(`${API_BASE}/activities/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(activityForm),
+      });
+      if (!res.ok) throw new Error("Error al actualizar");
+      const updated = await res.json();
+      setActivity(updated);
+      setShowActivityEditModal(false);
+      setSuccessMessage("Actividad actualizada correctamente");
+      setTimeout(() => setSuccessMessage(""), 3000);
+    } catch {
+      setError("No se pudo actualizar la actividad");
+    } finally {
+      setSubmittingActivity(false);
+    }
+  }
+
   if (loading) {
     return (
       <section className="ad">
         <div className="ad__loading">
           <div className="ad__loading-ring">
-            <div /><div /><div /><div />
+            <div />
+            <div />
+            <div />
+            <div />
           </div>
           <span>Cargando actividad...</span>
         </div>
@@ -417,7 +473,9 @@ export function ActivityDetails() {
     return (
       <section className="ad">
         <div className="ad__error">{error}</div>
-        <button className="ad__back" onClick={() => navigate(-1)}>← Volver</button>
+        <button className="ad__back" onClick={() => navigate(-1)}>
+          ← Volver
+        </button>
       </section>
     );
   }
@@ -429,7 +487,12 @@ export function ActivityDetails() {
     .reduce((sum, t) => sum + parseFloat(t.amount), 0);
 
   const totalExpense = transactions
-    .filter((t) => t.type === "PAYMENT" || t.type === "WITHDRAWAL")
+    .filter(
+      (t) =>
+        t.type === "PAYMENT" ||
+        t.type === "WITHDRAWAL" ||
+        t.type === "TRANSFER",
+    )
     .reduce((sum, t) => sum + parseFloat(t.amount), 0);
 
   const balance = parseFloat(activity.activityMoney);
@@ -439,14 +502,37 @@ export function ActivityDetails() {
       {/* ─── Top bar ─── */}
       <div className="ad__topbar">
         <button className="ad__back" onClick={() => navigate(-1)} type="button">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             <path d="M15 18l-6-6 6-6" />
           </svg>
           <span>Volver</span>
         </button>
         <div className="ad__topbar-actions">
-          <button className="ad__qr-trigger" onClick={() => setShowQrModal(true)} type="button" title="Ver QR de pago">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <button
+            className="ad__qr-trigger"
+            onClick={() => setShowQrModal(true)}
+            type="button"
+            title="Ver QR de pago"
+          >
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
               <rect x="3" y="3" width="7" height="7" rx="1" />
               <rect x="14" y="3" width="7" height="7" rx="1" />
               <rect x="3" y="14" width="7" height="7" rx="1" />
@@ -464,7 +550,10 @@ export function ActivityDetails() {
         <div className="ad__hero-card">
           <div className="ad__hero-card-glow" />
           <div className="ad__hero-top">
-            <div className="ad__hero-icon" style={{ color: "white", textTransform: "uppercase" }}>
+            <div
+              className="ad__hero-icon"
+              style={{ color: "white", textTransform: "uppercase" }}
+            >
               {activity.name.charAt(0)}
             </div>
             <div className="ad__hero-info">
@@ -479,34 +568,86 @@ export function ActivityDetails() {
           <div className="ad__hero-balance-section">
             <div className="ad__hero-balance">
               <span className="ad__hero-balance-label">Saldo disponible</span>
-              <span className={`ad__hero-balance-value ${balance >= 0 ? "is-positive" : "is-negative"}`}>
+              <span
+                className={`ad__hero-balance-value ${balance >= 0 ? "is-positive" : "is-negative"}`}
+              >
                 {formatMoney(balance)}
               </span>
             </div>
             <div className="ad__hero-meta-row">
-              <span className={`ad__badge ${activity.isActive ? "ad__badge--active" : "ad__badge--inactive"}`}>
+              <span
+                className={`ad__badge ${activity.isActive ? "ad__badge--active" : "ad__badge--inactive"}`}
+              >
                 <span className="ad__badge-dot" />
                 {activity.isActive ? "Activa" : "Inactiva"}
               </span>
-              <span className="ad__hero-date">{formatDate(activity.createdAt)}</span>
+              <span className="ad__hero-date">
+                {formatDate(activity.createdAt)}
+              </span>
             </div>
-            <button
-              className="ad__report-btn"
-              onClick={() => navigate(`/activity/${id}/report`)}
-              type="button"
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
-                <polyline points="14 2 14 8 20 8" />
-                <line x1="16" y1="13" x2="8" y2="13" />
-                <line x1="16" y1="17" x2="8" y2="17" />
-                <polyline points="10 9 9 9 8 9" />
-              </svg>
-              <span>Ver Reporte</span>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M5 12h14M12 5l7 7-7 7" />
-              </svg>
-            </button>
+            <div className="ad__hero-actions">
+              <button
+                className="ad__report-btn"
+                onClick={() => navigate(`/activity/${id}/report`)}
+                type="button"
+              >
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                  <polyline points="14 2 14 8 20 8" />
+                  <line x1="16" y1="13" x2="8" y2="13" />
+                  <line x1="16" y1="17" x2="8" y2="17" />
+                  <polyline points="10 9 9 9 8 9" />
+                </svg>
+                <span>Ver Reporte</span>
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
+              </button>
+              <button
+                className="ad__edit-activity-btn"
+                onClick={() => {
+                  setActivityForm({
+                    name: activity.name,
+                    description: activity.description || "",
+                  });
+                  setShowActivityEditModal(true);
+                }}
+                type="button"
+              >
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                </svg>
+                <span>Editar actividad</span>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -521,7 +662,14 @@ export function ActivityDetails() {
                 className="ad__qr-img"
               />
               <div className="ad__qr-overlay">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
                   <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
                 </svg>
                 <span>Ampliar</span>
@@ -532,17 +680,43 @@ export function ActivityDetails() {
 
           {/* Quick action buttons */}
           <div className="ad__quick-actions">
-            <button className="ad__action-btn ad__action-btn--charge" onClick={() => openForm("charge")} type="button">
+            <button
+              className="ad__action-btn ad__action-btn--charge"
+              onClick={() => openForm("charge")}
+              type="button"
+            >
               <div className="ad__action-btn-icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
                   <path d="M12 5v14M5 12h14" />
                 </svg>
               </div>
               <span>Cobrar</span>
             </button>
-            <button className="ad__action-btn ad__action-btn--pay" onClick={() => openForm("pay")} type="button">
+            <button
+              className="ad__action-btn ad__action-btn--pay"
+              onClick={() => openForm("pay")}
+              type="button"
+            >
               <div className="ad__action-btn-icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
                   <path d="M5 12h14M12 5l7 7-7 7" />
                 </svg>
               </div>
@@ -556,7 +730,16 @@ export function ActivityDetails() {
       <div className="ad__stats-strip">
         <div className="ad__stat ad__stat--income">
           <div className="ad__stat-icon-ring">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
               <path d="M12 5v14M19 12l-7 7-7-7" />
             </svg>
           </div>
@@ -568,7 +751,16 @@ export function ActivityDetails() {
         <div className="ad__stat-divider" />
         <div className="ad__stat ad__stat--expense">
           <div className="ad__stat-icon-ring">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
               <path d="M12 19V5M5 12l7-7 7 7" />
             </svg>
           </div>
@@ -580,7 +772,16 @@ export function ActivityDetails() {
         <div className="ad__stat-divider" />
         <div className="ad__stat ad__stat--count">
           <div className="ad__stat-icon-ring">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
               <path d="M4 6h16M4 12h16M4 18h10" />
             </svg>
           </div>
@@ -594,7 +795,16 @@ export function ActivityDetails() {
       {/* ─── Toast ─── */}
       {successMessage && (
         <div className="ad__toast">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             <path d="M20 6L9 17l-5-5" />
           </svg>
           {successMessage}
@@ -612,18 +822,42 @@ export function ActivityDetails() {
           <div className="ad__tx-empty">
             <div className="ad__tx-empty-visual">
               <div className="ad__tx-empty-circle">
-                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <svg
+                  width="40"
+                  height="40"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
                   <path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   <path d="M9 12h6M12 9v6" />
                 </svg>
               </div>
             </div>
             <h3>Sin movimientos aún</h3>
-            <p>Registra tu primer cobro o pago para comenzar a ver el historial.</p>
+            <p>
+              Registra tu primer cobro o pago para comenzar a ver el historial.
+            </p>
             <div className="ad__tx-empty-actions">
-              <button className="ad__action-btn ad__action-btn--charge" onClick={() => openForm("charge")} type="button">
+              <button
+                className="ad__action-btn ad__action-btn--charge"
+                onClick={() => openForm("charge")}
+                type="button"
+              >
                 <div className="ad__action-btn-icon">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
                     <path d="M12 5v14M5 12h14" />
                   </svg>
                 </div>
@@ -637,23 +871,36 @@ export function ActivityDetails() {
               const isIncome = tx.type === "DEPOSIT" || tx.type === "REFUND";
               return (
                 <div key={tx.id} className="ad__tx-row">
-                  <div className={`ad__tx-indicator ${isIncome ? "is-income" : "is-expense"}`}>
+                  <div
+                    className={`ad__tx-indicator ${isIncome ? "is-income" : "is-expense"}`}
+                  >
                     {TYPE_ICONS[tx.type] || "•"}
                   </div>
                   <div className="ad__tx-body">
                     <div className="ad__tx-primary">
                       <span className="ad__tx-name">{tx.nameCuate}</span>
-                      <span className={`ad__tx-amount ${isIncome ? "is-income" : "is-expense"}`}>
-                        {isIncome ? "+" : "−"}{formatMoney(tx.amount)}
+                      <span
+                        className={`ad__tx-amount ${isIncome ? "is-income" : "is-expense"}`}
+                      >
+                        {isIncome ? "+" : "−"}
+                        {formatMoney(tx.amount)}
                       </span>
                     </div>
                     <div className="ad__tx-secondary">
-                      <span className="ad__tx-type">{TYPE_LABELS[tx.type]}</span>
-                      {tx.description && <span className="ad__tx-desc"> · {tx.description}</span>}
-                      <span className="ad__tx-time">{formatShortDate(tx.date)}</span>
+                      <span className="ad__tx-type">
+                        {TYPE_LABELS[tx.type]}
+                      </span>
+                      {tx.description && (
+                        <span className="ad__tx-desc"> · {tx.description}</span>
+                      )}
+                      <span className="ad__tx-time">
+                        {formatShortDate(tx.date)}
+                      </span>
                     </div>
                   </div>
-                  <span className={`ad__tx-status ad__tx-status--${tx.status.toLowerCase()}`}>
+                  <span
+                    className={`ad__tx-status ad__tx-status--${tx.status.toLowerCase()}`}
+                  >
                     {STATUS_LABELS[tx.status]}
                   </span>
                 </div>
@@ -667,16 +914,36 @@ export function ActivityDetails() {
       {showQrModal && (
         <div className="ad__overlay" onClick={() => setShowQrModal(false)}>
           <div className="ad__qr-modal" onClick={(e) => e.stopPropagation()}>
-            <button className="ad__qr-modal-close" onClick={() => setShowQrModal(false)} type="button">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <button
+              className="ad__qr-modal-close"
+              onClick={() => setShowQrModal(false)}
+              type="button"
+            >
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <path d="M18 6L6 18M6 6l12 12" />
               </svg>
             </button>
             <div className="ad__qr-modal-content">
-              <img src="/qr_bueno.png" alt="Código QR BancoFie" className="ad__qr-modal-img" />
+              <img
+                src="/qr_bueno.png"
+                alt="Código QR BancoFie"
+                className="ad__qr-modal-img"
+              />
               <div className="ad__qr-modal-info">
                 <h3>{activity.name}</h3>
-                <p>Escanea este código QR con tu app de BancoFie para realizar un pago</p>
+                <p>
+                  Escanea este código QR con tu app de BancoFie para realizar un
+                  pago
+                </p>
                 {/* <span className="ad__qr-modal-amount">Saldo: {formatMoney(balance)}</span> */}
               </div>
             </div>
@@ -690,24 +957,59 @@ export function ActivityDetails() {
           <div className="ad__form-modal" onClick={(e) => e.stopPropagation()}>
             <div className="ad__form-header">
               <div className="ad__form-header-left">
-                <div className={`ad__form-mode-icon ${formMode === "pay" ? "is-pay" : "is-charge"}`}>
+                <div
+                  className={`ad__form-mode-icon ${formMode === "pay" ? "is-pay" : "is-charge"}`}
+                >
                   {formMode === "pay" ? (
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
                       <path d="M5 12h14M12 5l7 7-7 7" />
                     </svg>
                   ) : (
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
                       <path d="M12 5v14M5 12h14" />
                     </svg>
                   )}
                 </div>
                 <div>
-                  <h3>{formMode === "pay" ? "Registrar pago" : "Registrar cobro"}</h3>
+                  <h3>
+                    {formMode === "pay" ? "Registrar pago" : "Registrar cobro"}
+                  </h3>
                   <span className="ad__form-subtitle">{activity.name}</span>
                 </div>
               </div>
-              <button className="ad__form-close" onClick={() => setShowForm(false)} type="button">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <button
+                className="ad__form-close"
+                onClick={() => setShowForm(false)}
+                type="button"
+              >
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
                   <path d="M18 6L6 18M6 6l12 12" />
                 </svg>
               </button>
@@ -724,15 +1026,28 @@ export function ActivityDetails() {
                   style={{ display: "none" }}
                 />
                 <div className="ad__form-import-info">
-                  <span className="ad__form-import-label">Importación masiva</span>
-                  <span className="ad__form-import-desc">Importa varios movimientos desde un archivo Excel o CSV</span>
+                  <span className="ad__form-import-label">
+                    Importación masiva
+                  </span>
+                  <span className="ad__form-import-desc">
+                    Importa varios movimientos desde un archivo Excel o CSV
+                  </span>
                 </div>
                 <button
                   type="button"
                   className="ad__form-import-btn"
                   onClick={() => fileInputRef.current?.click()}
                 >
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                     <polyline points="17 8 12 3 7 8" />
                     <line x1="12" y1="3" x2="12" y2="15" />
@@ -752,7 +1067,9 @@ export function ActivityDetails() {
                     step="0.01"
                     min="0.01"
                     value={formData.amount}
-                    onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, amount: e.target.value })
+                    }
                     required
                     placeholder="0.00"
                     autoFocus
@@ -767,7 +1084,9 @@ export function ActivityDetails() {
                     id="tx-name"
                     type="text"
                     value={formData.nameCuate}
-                    onChange={(e) => setFormData({ ...formData, nameCuate: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, nameCuate: e.target.value })
+                    }
                     required
                     placeholder="Ej: Juan Pérez"
                   />
@@ -778,7 +1097,12 @@ export function ActivityDetails() {
                   <select
                     id="tx-type"
                     value={formData.type}
-                    onChange={(e) => setFormData({ ...formData, type: e.target.value as TransactionForm["type"] })}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        type: e.target.value as TransactionForm["type"],
+                      })
+                    }
                   >
                     {formMode === "charge" ? (
                       <>
@@ -801,7 +1125,9 @@ export function ActivityDetails() {
                     id="tx-description"
                     type="text"
                     value={formData.description}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, description: e.target.value })
+                    }
                     placeholder="Concepto del movimiento"
                   />
                 </div>
@@ -813,7 +1139,9 @@ export function ActivityDetails() {
                       id="tx-bank"
                       type="text"
                       value={formData.bankName}
-                      onChange={(e) => setFormData({ ...formData, bankName: e.target.value })}
+                      onChange={(e) =>
+                        setFormData({ ...formData, bankName: e.target.value })
+                      }
                       placeholder="Ej: BancoFie"
                     />
                   </div>
@@ -823,7 +1151,12 @@ export function ActivityDetails() {
                       id="tx-account"
                       type="text"
                       value={formData.accountNumber}
-                      onChange={(e) => setFormData({ ...formData, accountNumber: e.target.value })}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          accountNumber: e.target.value,
+                        })
+                      }
                       placeholder="123456789"
                     />
                   </div>
@@ -831,7 +1164,11 @@ export function ActivityDetails() {
               </div>
 
               <div className="ad__form-footer">
-                <button type="button" className="ad__form-btn ad__form-btn--cancel" onClick={() => setShowForm(false)}>
+                <button
+                  type="button"
+                  className="ad__form-btn ad__form-btn--cancel"
+                  onClick={() => setShowForm(false)}
+                >
                   Cancelar
                 </button>
                 <button
@@ -855,13 +1192,41 @@ export function ActivityDetails() {
       )}
 
       {showImportModal && (
-        <div className="ad__overlay" onClick={() => { setShowImportModal(false); setImportData([]); }}>
-          <div className="ad__import-modal" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="ad__overlay"
+          onClick={() => {
+            setShowImportModal(false);
+            setImportData([]);
+          }}
+        >
+          <div
+            className="ad__import-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="ad__import-header">
               <h3>Importar transacciones</h3>
-              <p>{formMode === "charge" ? "Modo cobro" : "Modo pago"} - {importData.length} filas</p>
-              <button className="ad__import-close" onClick={() => { setShowImportModal(false); setImportData([]); }} type="button">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <p>
+                {formMode === "charge" ? "Modo cobro" : "Modo pago"} -{" "}
+                {importData.length} filas
+              </p>
+              <button
+                className="ad__import-close"
+                onClick={() => {
+                  setShowImportModal(false);
+                  setImportData([]);
+                }}
+                type="button"
+              >
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
                   <path d="M18 6L6 18M6 6l12 12" />
                 </svg>
               </button>
@@ -903,7 +1268,9 @@ export function ActivityDetails() {
                 </tbody>
               </table>
               {importData.length > 100 && (
-                <p className="ad__import-note">Mostrando las primeras 100 de {importData.length} filas</p>
+                <p className="ad__import-note">
+                  Mostrando las primeras 100 de {importData.length} filas
+                </p>
               )}
             </div>
 
@@ -920,7 +1287,10 @@ export function ActivityDetails() {
                 <button
                   type="button"
                   className="ad__form-btn ad__form-btn--cancel"
-                  onClick={() => { setShowImportModal(false); setImportData([]); }}
+                  onClick={() => {
+                    setShowImportModal(false);
+                    setImportData([]);
+                  }}
                 >
                   Cancelar
                 </button>
@@ -928,16 +1298,118 @@ export function ActivityDetails() {
                   type="button"
                   className={`ad__form-btn ${formMode === "pay" ? "ad__form-btn--pay" : "ad__form-btn--charge"}`}
                   onClick={handleImportConfirm}
-                  disabled={importing || importData.filter((r) => !r.error).length === 0}
+                  disabled={
+                    importing || importData.filter((r) => !r.error).length === 0
+                  }
                 >
-                  {importing ? "Importando..." : `Importar ${importData.filter((r) => !r.error).length} transacciones`}
+                  {importing
+                    ? "Importando..."
+                    : `Importar ${importData.filter((r) => !r.error).length} transacciones`}
                 </button>
               </div>
             </div>
           </div>
         </div>
       )}
+
+      {showActivityEditModal && (
+        <div className="ad__overlay" onClick={() => setShowActivityEditModal(false)}>
+          <div className="ad__activity-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="ad__form-header">
+              <div className="ad__form-header-left">
+                <div className="ad__form-mode-icon is-charge">
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3>Editar actividad</h3>
+                  <span className="ad__form-subtitle">{activity.name}</span>
+                </div>
+              </div>
+              <button
+                className="ad__form-close"
+                onClick={() => setShowActivityEditModal(false)}
+                type="button"
+              >
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M18 6L6 18M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <form className="ad__form-body" onSubmit={handleUpdateActivity}>
+              <div className="ad__form-fields">
+                <div className="ad__form-group">
+                  <label htmlFor="act-edit-name">Nombre *</label>
+                  <input
+                    id="act-edit-name"
+                    type="text"
+                    value={activityForm.name}
+                    onChange={(e) =>
+                      setActivityForm({ ...activityForm, name: e.target.value })
+                    }
+                    required
+                    placeholder="Ej: Ventas de temporada"
+                  />
+                </div>
+
+                <div className="ad__form-group">
+                  <label htmlFor="act-edit-desc">Descripcion</label>
+                  <textarea
+                    id="act-edit-desc"
+                    value={activityForm.description}
+                    onChange={(e) =>
+                      setActivityForm({
+                        ...activityForm,
+                        description: e.target.value,
+                      })
+                    }
+                    placeholder="Describe la actividad..."
+                    rows={3}
+                  />
+                </div>
+              </div>
+
+              <div className="ad__form-footer">
+                <button
+                  type="button"
+                  className="ad__form-btn ad__form-btn--cancel"
+                  onClick={() => setShowActivityEditModal(false)}
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="ad__form-btn ad__form-btn--charge"
+                  disabled={submittingActivity}
+                >
+                  {submittingActivity ? "Guardando..." : "Guardar cambios"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
-
