@@ -5,19 +5,6 @@ import brandIcon from "../../assets/icon.webp"
 
 const navigation = [
   {
-    id: "dashboard",
-    label: "Dashboard",
-    path: "/",
-    icon: (
-      <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="2" y="2" width="7" height="8" rx="2" />
-        <rect x="11" y="2" width="7" height="5" rx="2" />
-        <rect x="2" y="12" width="7" height="6" rx="2" />
-        <rect x="11" y="9" width="7" height="9" rx="2" />
-      </svg>
-    ),
-  },
-  {
     id: "business",
     label: "Mis negocios",
     path: "/business",
@@ -41,11 +28,11 @@ const navigation = [
   },
   {
     id: "chatbot",
-    label: "Chatbot",
+    label: "Tinka IA",
     path: "/chatbot",
     icon: (
-      <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M3 10a7 7 0 0 1 7-7 7 7 0 0 1 7 7c0 3.87-3.13 7-7 7a7.9 7.9 0 0 1-3-.6L3 18l1.3-3.2A6.93 6.93 0 0 1 3 10z" />
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 3l1.912 5.813a2 2 0 0 0 1.275 1.275L21 12l-5.813 1.912a2 2 0 0 0-1.275 1.275L12 21l-1.912-5.813a2 2 0 0 0-1.275-1.275L3 12l5.813-1.912a2 2 0 0 0 1.275-1.275L12 3z" />
       </svg>
     ),
   },
@@ -111,7 +98,6 @@ export function Navbar({ user, onLogout }: NavbarProps) {
         />
         <div>
           <span className="navbar__eyebrow">Comunidad Tinka</span>
-          <strong>Tu registro de ventas, claro y rapido</strong>
         </div>
       </div>
 

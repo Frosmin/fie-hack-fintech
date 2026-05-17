@@ -29,14 +29,32 @@ export async function createTransaction(data: CreateTransactionInput) {
   const isIncome = INCOME_TYPES.has(data.type);
   const delta = isIncome ? data.amount : -data.amount;
 
-  // Atomically create transaction + update activity balance
-  const [transaction] = await prisma.$transaction([
-    prisma.bankTransaction.create({ data }),
-    prisma.activity.update({
+  // Look up the activity to find its parent business
+  const activity = await prisma.activity.findUnique({
+    where: { id: data.activityId },
+    select: { businessId: true },
+  });
+
+  if (!activity) {
+    throw new AppError("Actividad no encontrada", 404);
+  }
+
+  // Use interactive transaction for PrismaPg adapter compatibility
+  const transaction = await prisma.$transaction(async (tx) => {
+    const created = await tx.bankTransaction.create({ data });
+
+    await tx.activity.update({
       where: { id: data.activityId },
       data: { activityMoney: { increment: delta } },
-    }),
-  ]);
+    });
+
+    await tx.business.update({
+      where: { id: Number(activity.businessId) },
+      data: { BusinessMoney: { increment: delta } },
+    });
+
+    return created;
+  });
 
   return transaction;
 }
