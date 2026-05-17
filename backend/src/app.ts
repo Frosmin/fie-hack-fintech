@@ -16,7 +16,12 @@ app.get("/health", (req: Request, res: Response) => {
   res.json({ status: "ok", uptime: process.uptime() });
 });
 
+app.get("/api/health", (req: Request, res: Response) => {
+  res.json({ status: "ok", uptime: process.uptime() });
+});
+
 app.use("/api", routes);
+app.use("/", routes);
 
 app.use((req: Request, res: Response) => {
   res.status(404).json({ error: "Not found" });

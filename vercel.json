@@ -1,22 +1,21 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "installCommand": "pnpm install --dir frontend --frozen-lockfile && pnpm install --dir backend --frozen-lockfile",
-  "buildCommand": "pnpm --dir frontend build",
-  "outputDirectory": "frontend/dist",
+  "experimentalServices": {
+    "frontend": {
+      "entrypoint": "frontend",
+      "routePrefix": "/",
+      "framework": "vite"
+    },
+    "backend": {
+      "entrypoint": "backend",
+      "routePrefix": "/api"
+    }
+  },
   "functions": {
-    "api/index.ts": {
+    "backend/src/**/*.ts": {
       "maxDuration": 30,
       "includeFiles": "backend/src/generated/prisma/**"
     }
   },
-  "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "/api"
-    },
-    {
-      "source": "/((?!api/|.*\\..*).*)",
-      "destination": "/index.html"
-    }
-  ]
+  "rewrites": []
 }
