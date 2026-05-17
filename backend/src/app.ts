@@ -2,7 +2,6 @@ import express, { type Application, type Request, type Response } from "express"
 import helmet from "helmet";
 import cors from "cors";
 import morgan from "morgan";
-import routes from "./routes/index.js";
 import errorHandler from "./middlewares/error.middleware.js";
 
 const app: Application = express();
@@ -20,8 +19,19 @@ app.get("/api/health", (req: Request, res: Response) => {
   res.json({ status: "ok", uptime: process.uptime() });
 });
 
-app.use("/api", routes);
-app.use("/", routes);
+app.use(async (req, res, next) => {
+  try {
+    const { default: routes } = await import("./routes/index.js");
+
+    if (req.path.startsWith("/api")) {
+      req.url = req.url.replace(/^\/api(?=\/|$)/, "") || "/";
+    }
+
+    routes(req, res, next);
+  } catch (error) {
+    next(error);
+  }
+});
 
 app.use((req: Request, res: Response) => {
   res.status(404).json({ error: "Not found" });
