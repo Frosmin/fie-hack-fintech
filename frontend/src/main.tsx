@@ -9,6 +9,7 @@ import { Calculator } from './features/calculator/Calculator'
 import { Chatbot } from './features/chatbot/Chatbot'
 import { AuthPage } from './features/auth/AuthPage'
 import { ActivityDetails } from './features/activityDetails/ActivityDetails'
+import { ActivityReport } from './features/activityReport/ActivityReport'
 
 const router = createBrowserRouter([
   {
@@ -25,6 +26,7 @@ const router = createBrowserRouter([
       { path: 'calculator', element: <Calculator /> },
       { path: 'chatbot', element: <Chatbot /> },
       { path: 'activity/:id', element: <ActivityDetails /> },
+      { path: 'activity/:id/report', element: <ActivityReport /> },
     ],
   },
 ])
