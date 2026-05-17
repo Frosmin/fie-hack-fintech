@@ -350,12 +350,31 @@ export function Calculator() {
           <h2>Presupuesto de producto</h2>
         </div>
         <p>
-          Analiza la viabilidad financiera de tu próximo producto con
+          Analiza la viabilidad financiera de tu proximo producto con
           inteligencia artificial. Toma decisiones basadas en datos.
         </p>
       </div>
 
-      {/* ── Form + Tips ───────────────────────────────────────────── */}
+      {/* ── Quick Tips Horizontal ─────────────────────────────────── */}
+      <div className="calc-tips-row">
+        {QUICK_TIPS.map((tip, i) => (
+          <div
+            key={tip.title}
+            className="calc-tip-card-horizontal"
+            style={{ animationDelay: `${i * 80}ms` }}
+          >
+            <div className="calc-tip-card-horizontal__icon">
+              {Icons[tip.icon](20)}
+            </div>
+            <div className="calc-tip-card-horizontal__content">
+              <h4>{tip.title}</h4>
+              <p>{tip.description}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* ── Form ───────────────────────────────────────────────────── */}
       <div className="calc-grid">
         <article className="panel">
           <div className="panel__header">
@@ -367,7 +386,7 @@ export function Calculator() {
           </div>
 
           <div className="calc-form__fields">
-            <label className="full-width">
+            <label>
               Nombre del producto
               <input
                 id="calc-product-name"
@@ -472,7 +491,7 @@ export function Calculator() {
               </span>
             </label>
 
-            <label>
+<label>
               Ventas estimadas por mes
               <input
                 id="calc-monthly-sales"
@@ -484,12 +503,12 @@ export function Calculator() {
                 onChange={(e) => setEstimatedMonthlySales(e.target.value)}
               />
               <span className="input-hint">
-                Cuántas unidades esperas vender al mes
+                Cuantas unidades esperas vender al mes
               </span>
             </label>
 
-            <label className="full-width">
-              Inversión inicial (Bs)
+            <label>
+              Inversion inicial (Bs)
               <input
                 id="calc-initial-investment"
                 type="number"
@@ -500,12 +519,12 @@ export function Calculator() {
                 onChange={(e) => setInitialInvestment(e.target.value)}
               />
               <span className="input-hint">
-                Maquinaria, materia prima inicial, diseño de marca, etc.
+                Maquinaria, materia prima inicial, diseno de marca, etc.
               </span>
-            </label>
+</label>
 
             {error && (
-              <div className="calc-error full-width">
+              <div className="calc-error">
                 <span className="calc-error__icon">
                   {Icons.alertTriangle(18)}
                 </span>{" "}
@@ -532,30 +551,6 @@ export function Calculator() {
                 </>
               )}
             </button>
-          </div>
-        </article>
-
-        {/* ── Quick Tips Sidebar ──────────────────────────────────── */}
-        <article className="panel">
-          <div className="panel__header">
-            <div>
-              <span className="panel__eyebrow">Guía rápida</span>
-              <h3>Tips para emprender</h3>
-            </div>
-          </div>
-
-          <div className="calc-tips">
-            {QUICK_TIPS.map((tip, i) => (
-              <div
-                key={tip.title}
-                className="calc-tip-card"
-                style={{ animationDelay: `${i * 80}ms` }}
-              >
-                <div className="calc-tip-card__icon">{Icons[tip.icon](18)}</div>
-                <h4>{tip.title}</h4>
-                <p>{tip.description}</p>
-              </div>
-            ))}
           </div>
         </article>
       </div>
