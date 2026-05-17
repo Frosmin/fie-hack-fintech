@@ -19,7 +19,7 @@ router.get("/", (_req, res) => {
 router.use("/auth", authRoutes);
 router.use("/calculator", calculatorRoutes);
 router.use("/users", userRoutes);
-router.use("/businesses", businessRoutes);
+router.use("/business", businessRoutes);
 router.use("/activities", activityRoutes);
 router.use("/products", productRoutes);
 router.use("/payment-methods", paymentMethodRoutes);
