@@ -5,6 +5,7 @@ import { serializeBigInt } from "../helpers/serialize.helper.js";
 import {
   createTransactionSchema,
   updateTransactionSchema,
+  batchTransactionSchema,
 } from "../schemas/transaction.schema.js";
 
 export async function createTransaction(
@@ -110,6 +111,31 @@ export async function deleteTransaction(
 
     await transactionService.deleteTransaction(id);
     return res.status(204).send();
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function createBatchTransactions(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    const parsed = batchTransactionSchema.safeParse(req.body);
+    if (!parsed.success) {
+      const firstError = parsed.error.issues[0];
+      throw new AppError(firstError?.message ?? "Validation error", 400);
+    }
+
+    const { activityId, mode, transactions } = parsed.data;
+    const result = await transactionService.createBatchTransactions(
+      activityId,
+      mode,
+      transactions
+    );
+
+    return res.status(200).json(result);
   } catch (error) {
     next(error);
   }

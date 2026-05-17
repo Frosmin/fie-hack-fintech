@@ -1,27 +1,105 @@
-import "./Sales.css";
+import { useState } from 'react';
+import { VoiceRecorder } from './VoiceRecorder';
+import type { Sale } from './types';
+import './Sales.css';
 
-const recentSales = [
+const recentSales: Sale[] = [
   {
-    customer: "Laura R.",
-    product: "Plant Kit",
-    amount: "$38",
-    status: "Cobrado",
+    id: '1',
+    customer: 'Laura R.',
+    product: 'Plant Kit',
+    amount: 38,
+    channel: 'whatsapp',
+    paymentType: 'efectivo',
+    status: 'cobrado',
+    createdAt: new Date(),
   },
   {
-    customer: "Miguel T.",
-    product: "Pack Branding",
-    amount: "$120",
-    status: "Pendiente",
+    id: '2',
+    customer: 'Miguel T.',
+    product: 'Pack Branding',
+    amount: 120,
+    channel: 'instagram',
+    paymentType: 'transferencia',
+    status: 'pendiente',
+    createdAt: new Date(),
   },
   {
-    customer: "Ana V.",
-    product: "Mentoría 1:1",
-    amount: "$65",
-    status: "Confirmado",
+    id: '3',
+    customer: 'Ana V.',
+    product: 'Mentoría 1:1',
+    amount: 65,
+    channel: 'web',
+    paymentType: 'qr',
+    status: 'confirmado',
+    createdAt: new Date(),
   },
 ];
 
 export function Sales() {
+  const [formData, setFormData] = useState({
+    customer: '',
+    product: '',
+    amount: '',
+    channel: 'whatsapp',
+    paymentType: 'efectivo',
+    status: 'pendiente',
+    notes: '',
+  });
+
+  const [pendingSales, setPendingSales] = useState<Partial<Sale>[]>([]);
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleVoiceExtracted = (extracted: Partial<Sale>) => {
+    setFormData({
+      customer: extracted.customer || '',
+      product: extracted.product || '',
+      amount: extracted.amount?.toString() || '',
+      channel: extracted.channel || 'whatsapp',
+      paymentType: extracted.paymentType || 'efectivo',
+      status: extracted.status || 'pendiente',
+      notes: '',
+    });
+  };
+
+  const handleAddPending = () => {
+    if (formData.product && formData.amount) {
+      const newSale: Partial<Sale> = {
+        customer: formData.customer,
+        product: formData.product,
+        amount: Number(formData.amount),
+        channel: formData.channel as Sale['channel'],
+        paymentType: formData.paymentType as Sale['paymentType'],
+        status: formData.status as Sale['status'],
+        notes: formData.notes,
+        id: Date.now().toString(),
+      };
+      setPendingSales([...pendingSales, newSale]);
+      setFormData({
+        customer: '',
+        product: '',
+        amount: '',
+        channel: 'whatsapp',
+        paymentType: 'efectivo',
+        status: 'pendiente',
+        notes: '',
+      });
+    }
+  };
+
+  const handleRemovePending = (id: string) => {
+    setPendingSales(pendingSales.filter((s) => s.id !== id));
+  };
+
+  const handleSaveAll = () => {
+    console.log('Guardando ventas:', [...recentSales, ...pendingSales]);
+    setPendingSales([]);
+    alert('Ventas guardadas correctamente');
+  };
+
   return (
     <section className="sales">
       <div className="section-heading">
@@ -44,25 +122,45 @@ export function Sales() {
             </div>
           </div>
 
-          <form className="sales-form__grid">
+          <VoiceRecorder onSaleExtracted={handleVoiceExtracted} />
+
+          <form className="sales-form__grid" onSubmit={(e) => e.preventDefault()}>
             <label>
               Cliente
-              <input type="text" placeholder="Nombre del cliente" />
+              <input
+                type="text"
+                placeholder="Nombre del cliente"
+                value={formData.customer}
+                onChange={(e) => handleInputChange('customer', e.target.value)}
+              />
             </label>
 
             <label>
               Producto / servicio
-              <input type="text" placeholder="Qué se vendió" />
+              <input
+                type="text"
+                placeholder="Qué se vendió"
+                value={formData.product}
+                onChange={(e) => handleInputChange('product', e.target.value)}
+              />
             </label>
 
             <label>
               Monto
-              <input type="text" placeholder="$0.00" />
+              <input
+                type="number"
+                placeholder="0.00"
+                value={formData.amount}
+                onChange={(e) => handleInputChange('amount', e.target.value)}
+              />
             </label>
 
             <label>
               Canal
-              <select defaultValue="whatsapp">
+              <select
+                value={formData.channel}
+                onChange={(e) => handleInputChange('channel', e.target.value)}
+              >
                 <option value="whatsapp">WhatsApp</option>
                 <option value="instagram">Instagram</option>
                 <option value="web">Web</option>
@@ -71,8 +169,24 @@ export function Sales() {
             </label>
 
             <label>
+              Tipo de pago
+              <select
+                value={formData.paymentType}
+                onChange={(e) => handleInputChange('paymentType', e.target.value)}
+              >
+                <option value="efectivo">Efectivo</option>
+                <option value="qr">QR</option>
+                <option value="transferencia">Transferencia</option>
+                <option value="otro">Otro</option>
+              </select>
+            </label>
+
+            <label>
               Estado
-              <select defaultValue="pendiente">
+              <select
+                value={formData.status}
+                onChange={(e) => handleInputChange('status', e.target.value)}
+              >
                 <option value="pendiente">Pendiente</option>
                 <option value="confirmado">Confirmado</option>
                 <option value="cobrado">Cobrado</option>
@@ -84,13 +198,61 @@ export function Sales() {
               <textarea
                 rows={4}
                 placeholder="Detalles de pago, entrega o seguimiento"
+                value={formData.notes}
+                onChange={(e) => handleInputChange('notes', e.target.value)}
               />
             </label>
 
-            <button type="button" className="primary-action">
-              Registrar venta
-            </button>
+            <div className="sales-form__actions">
+              <button type="button" className="secondary-action" onClick={handleAddPending}>
+                Agregar a lista
+              </button>
+              <button type="button" className="primary-action" onClick={handleSaveAll} disabled={pendingSales.length === 0}>
+                Registrar {pendingSales.length > 0 ? `(${pendingSales.length})` : ''}
+              </button>
+            </div>
           </form>
+        </article>
+
+        <article className="panel pending-sales">
+          <div className="panel__header">
+            <div>
+              <span className="panel__eyebrow">Ventas pendientes</span>
+              <h3>Por registrar</h3>
+            </div>
+            <span className="panel__badge">{pendingSales.length}</span>
+          </div>
+
+          {pendingSales.length === 0 ? (
+            <div className="empty-state">
+              <p>No hay ventas pendientes</p>
+              <span>Agrega ventas con el micrófono o el formulario</span>
+            </div>
+          ) : (
+            <>
+              <div className="pending-sales__list">
+                {pendingSales.map((sale) => (
+                  <article key={sale.id} className="pending-item">
+                    <div>
+                      <strong>{sale.customer || 'Sin cliente'}</strong>
+                      <span>{sale.product}</span>
+                    </div>
+                    <div className="pending-item__meta">
+                      <strong>${sale.amount}</strong>
+                      <button
+                        type="button"
+                        className="remove-btn"
+                        onClick={() => handleRemovePending(sale.id!)}
+                        aria-label="Eliminar"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </>
+          )}
         </article>
 
         <article className="panel sales-list">
@@ -99,21 +261,18 @@ export function Sales() {
               <span className="panel__eyebrow">Movimientos recientes</span>
               <h3>Últimas operaciones</h3>
             </div>
-            <span className="panel__badge">3 hoy</span>
+            <span className="panel__badge">{recentSales.length} hoy</span>
           </div>
 
           <div className="sales-list__items">
             {recentSales.map((sale) => (
-              <article
-                key={`${sale.customer}-${sale.product}`}
-                className="sale-item"
-              >
+              <article key={sale.id} className="sale-item">
                 <div>
                   <strong>{sale.customer}</strong>
                   <span>{sale.product}</span>
                 </div>
                 <div className="sale-item__meta">
-                  <strong>{sale.amount}</strong>
+                  <strong>${sale.amount}</strong>
                   <span>{sale.status}</span>
                 </div>
               </article>

@@ -3,25 +3,127 @@ import "./Calculator.css";
 
 /* ─── SVG Icons ───────────────────────────────────────────────────── */
 
-const Icon = ({ children, size = 20 }: { children: ReactNode; size?: number }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">{children}</svg>
+const Icon = ({
+  children,
+  size = 20,
+}: {
+  children: ReactNode;
+  size?: number;
+}) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    {children}
+  </svg>
 );
 
 const Icons = {
-  target: (s = 20) => <Icon size={s}><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></Icon>,
-  barChart: (s = 20) => <Icon size={s}><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></Icon>,
-  lightbulb: (s = 20) => <Icon size={s}><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2z"/></Icon>,
-  refresh: (s = 20) => <Icon size={s}><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></Icon>,
-  sparkles: (s = 20) => <Icon size={s}><path d="M12 3l1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5z"/><path d="M19 13l.75 2.25L22 16l-2.25.75L19 19l-.75-2.25L16 16l2.25-.75z"/></Icon>,
-  trendingUp: (s = 20) => <Icon size={s}><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></Icon>,
-  trendingDown: (s = 20) => <Icon size={s}><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></Icon>,
-  dollarSign: (s = 20) => <Icon size={s}><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></Icon>,
-  percent: (s = 20) => <Icon size={s}><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></Icon>,
-  checkCircle: (s = 20) => <Icon size={s}><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></Icon>,
-  alertTriangle: (s = 20) => <Icon size={s}><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></Icon>,
-  alertOctagon: (s = 20) => <Icon size={s}><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></Icon>,
-  info: (s = 20) => <Icon size={s}><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></Icon>,
-  cpu: (s = 20) => <Icon size={s}><rect x="4" y="4" width="16" height="16" rx="2" ry="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></Icon>,
+  target: (s = 20) => (
+    <Icon size={s}>
+      <circle cx="12" cy="12" r="10" />
+      <circle cx="12" cy="12" r="6" />
+      <circle cx="12" cy="12" r="2" />
+    </Icon>
+  ),
+  barChart: (s = 20) => (
+    <Icon size={s}>
+      <line x1="12" y1="20" x2="12" y2="10" />
+      <line x1="18" y1="20" x2="18" y2="4" />
+      <line x1="6" y1="20" x2="6" y2="16" />
+    </Icon>
+  ),
+  lightbulb: (s = 20) => (
+    <Icon size={s}>
+      <path d="M9 18h6" />
+      <path d="M10 22h4" />
+      <path d="M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2z" />
+    </Icon>
+  ),
+  refresh: (s = 20) => (
+    <Icon size={s}>
+      <polyline points="23 4 23 10 17 10" />
+      <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+    </Icon>
+  ),
+  sparkles: (s = 20) => (
+    <Icon size={s}>
+      <path d="M12 3l1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5z" />
+      <path d="M19 13l.75 2.25L22 16l-2.25.75L19 19l-.75-2.25L16 16l2.25-.75z" />
+    </Icon>
+  ),
+  trendingUp: (s = 20) => (
+    <Icon size={s}>
+      <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+      <polyline points="17 6 23 6 23 12" />
+    </Icon>
+  ),
+  trendingDown: (s = 20) => (
+    <Icon size={s}>
+      <polyline points="23 18 13.5 8.5 8.5 13.5 1 6" />
+      <polyline points="17 18 23 18 23 12" />
+    </Icon>
+  ),
+  dollarSign: (s = 20) => (
+    <Icon size={s}>
+      <line x1="12" y1="1" x2="12" y2="23" />
+      <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+    </Icon>
+  ),
+  percent: (s = 20) => (
+    <Icon size={s}>
+      <line x1="19" y1="5" x2="5" y2="19" />
+      <circle cx="6.5" cy="6.5" r="2.5" />
+      <circle cx="17.5" cy="17.5" r="2.5" />
+    </Icon>
+  ),
+  checkCircle: (s = 20) => (
+    <Icon size={s}>
+      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+      <polyline points="22 4 12 14.01 9 11.01" />
+    </Icon>
+  ),
+  alertTriangle: (s = 20) => (
+    <Icon size={s}>
+      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+      <line x1="12" y1="9" x2="12" y2="13" />
+      <line x1="12" y1="17" x2="12.01" y2="17" />
+    </Icon>
+  ),
+  alertOctagon: (s = 20) => (
+    <Icon size={s}>
+      <polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2" />
+      <line x1="12" y1="8" x2="12" y2="12" />
+      <line x1="12" y1="16" x2="12.01" y2="16" />
+    </Icon>
+  ),
+  info: (s = 20) => (
+    <Icon size={s}>
+      <circle cx="12" cy="12" r="10" />
+      <line x1="12" y1="16" x2="12" y2="12" />
+      <line x1="12" y1="8" x2="12.01" y2="8" />
+    </Icon>
+  ),
+  cpu: (s = 20) => (
+    <Icon size={s}>
+      <rect x="4" y="4" width="16" height="16" rx="2" ry="2" />
+      <rect x="9" y="9" width="6" height="6" />
+      <line x1="9" y1="1" x2="9" y2="4" />
+      <line x1="15" y1="1" x2="15" y2="4" />
+      <line x1="9" y1="20" x2="9" y2="23" />
+      <line x1="15" y1="20" x2="15" y2="23" />
+      <line x1="20" y1="9" x2="23" y2="9" />
+      <line x1="20" y1="14" x2="23" y2="14" />
+      <line x1="1" y1="9" x2="4" y2="9" />
+      <line x1="1" y1="14" x2="4" y2="14" />
+    </Icon>
+  ),
 };
 
 /* ─── Types ───────────────────────────────────────────────────────── */
@@ -126,8 +228,7 @@ const QUICK_TIPS = [
   {
     icon: "refresh" as const,
     title: "Itera rápido",
-    description:
-      "Ajusta precios y costos según la respuesta real del mercado.",
+    description: "Ajusta precios y costos según la respuesta real del mercado.",
   },
 ];
 
@@ -225,7 +326,9 @@ export function Calculator() {
 
       setResult(data.data);
     } catch {
-      setError("No se pudo conectar con el servidor. Verifica que el backend esté activo.");
+      setError(
+        "No se pudo conectar con el servidor. Verifica que el backend esté activo.",
+      );
     } finally {
       setLoading(false);
     }
@@ -241,20 +344,37 @@ export function Calculator() {
   return (
     <section className="calculator" id="calculator-view">
       {/* ── Header ────────────────────────────────────────────────── */}
-      <div className="section-heading">
+      <div className="section-heading chat-hero">
         <div>
-          <span className="section-heading__eyebrow">
-            Calculadora IA
-          </span>
+          <span className="section-heading__eyebrow">Calculadora IA</span>
           <h2>Presupuesto de producto</h2>
         </div>
         <p>
-          Analiza la viabilidad financiera de tu próximo producto con
+          Analiza la viabilidad financiera de tu proximo producto con
           inteligencia artificial. Toma decisiones basadas en datos.
         </p>
       </div>
 
-      {/* ── Form + Tips ───────────────────────────────────────────── */}
+      {/* ── Quick Tips Horizontal ─────────────────────────────────── */}
+      <div className="calc-tips-row">
+        {QUICK_TIPS.map((tip, i) => (
+          <div
+            key={tip.title}
+            className="calc-tip-card-horizontal"
+            style={{ animationDelay: `${i * 80}ms` }}
+          >
+            <div className="calc-tip-card-horizontal__icon">
+              {Icons[tip.icon](20)}
+            </div>
+            <div className="calc-tip-card-horizontal__content">
+              <h4>{tip.title}</h4>
+              <p>{tip.description}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* ── Form ───────────────────────────────────────────────────── */}
       <div className="calc-grid">
         <article className="panel">
           <div className="panel__header">
@@ -266,7 +386,7 @@ export function Calculator() {
           </div>
 
           <div className="calc-form__fields">
-            <label className="full-width">
+            <label>
               Nombre del producto
               <input
                 id="calc-product-name"
@@ -371,7 +491,7 @@ export function Calculator() {
               </span>
             </label>
 
-            <label>
+<label>
               Ventas estimadas por mes
               <input
                 id="calc-monthly-sales"
@@ -383,12 +503,12 @@ export function Calculator() {
                 onChange={(e) => setEstimatedMonthlySales(e.target.value)}
               />
               <span className="input-hint">
-                Cuántas unidades esperas vender al mes
+                Cuantas unidades esperas vender al mes
               </span>
             </label>
 
-            <label className="full-width">
-              Inversión inicial (Bs)
+            <label>
+              Inversion inicial (Bs)
               <input
                 id="calc-initial-investment"
                 type="number"
@@ -399,13 +519,16 @@ export function Calculator() {
                 onChange={(e) => setInitialInvestment(e.target.value)}
               />
               <span className="input-hint">
-                Maquinaria, materia prima inicial, diseño de marca, etc.
+                Maquinaria, materia prima inicial, diseno de marca, etc.
               </span>
-            </label>
+</label>
 
             {error && (
-              <div className="calc-error full-width">
-                <span className="calc-error__icon">{Icons.alertTriangle(18)}</span> {error}
+              <div className="calc-error">
+                <span className="calc-error__icon">
+                  {Icons.alertTriangle(18)}
+                </span>{" "}
+                {error}
               </div>
             )}
 
@@ -424,30 +547,10 @@ export function Calculator() {
               ) : (
                 <>
                   {/* <span className="btn-icon">{Icons.sparkles(20)}</span> */}
-                  Analizar viabilidad 
+                  Analizar viabilidad
                 </>
               )}
             </button>
-          </div>
-        </article>
-
-        {/* ── Quick Tips Sidebar ──────────────────────────────────── */}
-        <article className="panel">
-          <div className="panel__header">
-            <div>
-              <span className="panel__eyebrow">Guía rápida</span>
-              <h3>Tips para emprender</h3>
-            </div>
-          </div>
-
-          <div className="calc-tips">
-            {QUICK_TIPS.map((tip, i) => (
-              <div key={tip.title} className="calc-tip-card" style={{ animationDelay: `${i * 80}ms` }}>
-                <div className="calc-tip-card__icon">{Icons[tip.icon](18)}</div>
-                <h4>{tip.title}</h4>
-                <p>{tip.description}</p>
-              </div>
-            ))}
           </div>
         </article>
       </div>
@@ -629,9 +732,7 @@ export function Calculator() {
           <article className="panel">
             <div className="panel__header">
               <div>
-                <span className="panel__eyebrow">
-                  Recomendaciones IA
-                </span>
+                <span className="panel__eyebrow">Recomendaciones IA</span>
                 <h3>Plan de acción sugerido</h3>
               </div>
               <span className="panel__badge">
@@ -663,7 +764,9 @@ export function Calculator() {
                 <span className="panel__eyebrow">Proyección a 12 meses</span>
                 <h3>Ingresos vs. costos</h3>
               </div>
-              <span className={`panel__badge ${result.projections[11]?.cumulativeProfit >= 0 ? 'panel__badge--success' : 'panel__badge--warning'}`}>
+              <span
+                className={`panel__badge ${result.projections[11]?.cumulativeProfit >= 0 ? "panel__badge--success" : "panel__badge--warning"}`}
+              >
                 {result.projections[11]?.cumulativeProfit >= 0
                   ? "Rentable"
                   : "En pérdida"}
@@ -677,10 +780,8 @@ export function Calculator() {
                       Math.max(p.revenue, p.costs),
                     ),
                   );
-                  const revH =
-                    maxVal > 0 ? (proj.revenue / maxVal) * 220 : 10;
-                  const costH =
-                    maxVal > 0 ? (proj.costs / maxVal) * 220 : 10;
+                  const revH = maxVal > 0 ? (proj.revenue / maxVal) * 220 : 10;
+                  const costH = maxVal > 0 ? (proj.costs / maxVal) * 220 : 10;
 
                   return (
                     <div key={proj.month} className="calc-proj-bar">
@@ -699,8 +800,7 @@ export function Calculator() {
                       <span>M{proj.month}</span>
                       <strong
                         style={{
-                          color:
-                            proj.profit >= 0 ? "#2ecc71" : "#e74c3c",
+                          color: proj.profit >= 0 ? "#2ecc71" : "#e74c3c",
                         }}
                       >
                         {proj.profit >= 0 ? "+" : ""}
