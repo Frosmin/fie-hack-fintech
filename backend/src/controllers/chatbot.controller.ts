@@ -1,7 +1,6 @@
 import type { NextFunction, Response } from "express";
 import AppError from "../errors/appError.js";
 import { chatbotMessageSchema } from "../schemas/chatbot.schema.js";
-import * as chatbotService from "../services/chatbot.service.js";
 import type { AuthenticatedRequest } from "../types/authenticated-request.js";
 
 export async function sendChatbotMessage(
@@ -23,7 +22,8 @@ export async function sendChatbotMessage(
       );
     }
 
-    const reply = await chatbotService.generateBusinessReply(userId, parsed.data);
+    const { generateBusinessReply } = await import("../services/chatbot.service.js");
+    const reply = await generateBusinessReply(userId, parsed.data);
     return res.status(200).json({ reply });
   } catch (error) {
     next(error);
