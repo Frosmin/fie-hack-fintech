@@ -29,6 +29,7 @@ model Business {
   logoUrl     String?
   address     String?
   phone       String?
+  BusinessMoney   Decimal     @db.Decimal(12, 2) @default(0)
   isActive    Boolean     @default(true)
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
@@ -48,6 +49,7 @@ model Activity {
   description String?
   icon        String?
   qr_url       String?
+  activityMoney Decimal     @db.Decimal(12, 2) @default(0)
   isActive    Boolean     @default(true)
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
@@ -55,8 +57,30 @@ model Activity {
   businessId  BigInt
   business    Business    @relation(fields: [businessId], references: [id])
   products    Product[]
+  transactions BankTransaction[]
 
   @@index([businessId])
+}
+
+model BankTransaction {
+  id            BigInt            @id @default(autoincrement())
+  nameCuate     String           
+  amount        Decimal          @db.Decimal(12, 2)
+  type          TransactionType
+  description   String?
+  date          DateTime         @default(now())
+  status        TransactionStatus @default(PENDING)
+  bankName      String?
+  accountNumber String?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  activityId    BigInt
+  activity      Activity         @relation(fields: [activityId], references: [id])
+
+  @@index([activityId])
+  @@index([date])
+  @@index([status])
 }
 
 model Product {
@@ -176,4 +200,19 @@ enum PaymentType {
   TRANSFER
   WALLET
   OTHER
+}
+
+enum TransactionType {
+  DEPOSIT
+  WITHDRAWAL
+  TRANSFER
+  PAYMENT
+  REFUND
+}
+
+enum TransactionStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  CANCELLED
 }
