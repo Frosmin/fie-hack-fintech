@@ -2,6 +2,7 @@
 // npm install --save-dev prisma dotenv
 import "dotenv/config";
 import { defineConfig } from "prisma/config";
+import { readEnv } from "./src/config.js";
 
 // Evita errores de TypeScript al no estar cargado el entorno de tipos de Node
 declare const process: { argv: string[]; env: Record<string, string | undefined> };
@@ -12,8 +13,8 @@ const isMigration = process.argv.some(arg =>
 );
 
 const databaseUrl = isMigration 
-  ? (process.env["DIRECT_URL"] || process.env["DATABASE_URL"])
-  : process.env["DATABASE_URL"];
+  ? (readEnv("DIRECT_URL") || readEnv("DATABASE_URL"))
+  : readEnv("DATABASE_URL");
 
 export default defineConfig({
   schema: "prisma/schema.prisma",
@@ -24,4 +25,3 @@ export default defineConfig({
     url: databaseUrl,
   },
 });
-
