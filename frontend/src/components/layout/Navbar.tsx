@@ -5,19 +5,6 @@ import brandIcon from "../../assets/icon.webp"
 
 const navigation = [
   {
-    id: "dashboard",
-    label: "Dashboard",
-    path: "/",
-    icon: (
-      <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="2" y="2" width="7" height="8" rx="2" />
-        <rect x="11" y="2" width="7" height="5" rx="2" />
-        <rect x="2" y="12" width="7" height="6" rx="2" />
-        <rect x="11" y="9" width="7" height="9" rx="2" />
-      </svg>
-    ),
-  },
-  {
     id: "business",
     label: "Mis negocios",
     path: "/business",

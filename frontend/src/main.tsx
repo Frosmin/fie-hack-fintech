@@ -3,7 +3,6 @@ import { createRoot } from 'react-dom/client'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import './index.css'
 import App from './App.tsx'
-import { Dashboard } from './features/dashboard/Dashboard'
 import { Business } from './features/business/Business'
 import { Calculator } from './features/calculator/Calculator'
 import { Chatbot } from './features/chatbot/Chatbot'
@@ -21,8 +20,7 @@ const router = createBrowserRouter([
     path: '/',
     element: <App />,
     children: [
-      { index: true, element: <Dashboard /> },
-      { path: 'dashboard', element: <Dashboard /> },
+      { index: true, element: <Business /> },  
       { path: 'business', element: <Business /> },
       { path: 'business/:bizId/report', element: <BusinessReport /> },
       { path: 'calculator', element: <Calculator /> },
