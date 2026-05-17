@@ -1,11 +1,12 @@
 import { useState } from "react";
+import type { ReactNode } from "react";
 import { Navbar, type AppView } from "./components/layout/Navbar";
 import { Chatbot } from "./features/chatbot/Chatbot";
 import { Dashboard } from "./features/dashboard/Dashboard";
 import { Sales } from "./features/sales/Sales";
 import "./App.css";
 
-const views: Record<AppView, JSX.Element> = {
+const views: Record<AppView, ReactNode> = {
   dashboard: <Dashboard />,
   sales: <Sales />,
   chatbot: <Chatbot />,
