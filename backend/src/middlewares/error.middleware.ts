@@ -14,6 +14,8 @@ const errorHandler = (
     });
   }
 
+  console.error(err);
+
   return res.status(500).json({
     error: isProduction ? "Internal server error" : err.message,
   });
