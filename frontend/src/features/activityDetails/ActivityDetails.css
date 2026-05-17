@@ -39,6 +39,13 @@
 .ad__badge--inactive .ad__badge-dot { background:#9ca3af; }
 .ad__hero-date { font-size:.78rem; color:var(--muted); }
 
+/* Report button */
+.ad__report-btn { display:inline-flex; align-items:center; gap:8px; margin-top:12px; padding:10px 20px; border-radius:12px; border:none; cursor:pointer; font-weight:700; font-size:.86rem; background:linear-gradient(135deg,var(--primary),var(--secondary)); color:#fff; transition:all .25s; box-shadow:0 4px 16px rgba(238,0,138,.18); }
+.ad__report-btn:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(238,0,138,.28); filter:brightness(1.05); }
+.ad__report-btn:active { transform:translateY(0); }
+.ad__report-btn svg:last-child { transition:transform .2s; }
+.ad__report-btn:hover svg:last-child { transform:translateX(3px); }
+
 /* ── QR card ── */
 .ad__qr-card { border-radius:var(--radius-xl); background:#fff; border:1px solid #dbe2f0; padding:24px; display:flex; flex-direction:column; gap:16px; align-items:center; box-shadow:0 4px 24px rgba(43,67,130,.06); }
 .ad__qr-card-inner { display:flex; flex-direction:column; align-items:center; gap:10px; width:100%; }
