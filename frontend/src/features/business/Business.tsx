@@ -39,7 +39,19 @@ export function Business() {
   const [submitting, setSubmitting] = useState(false);
 
   // Activity list state
-  const [selectedBiz, setSelectedBiz] = useState<BusinessData | null>(null);
+  const [selectedBiz, setSelectedBizState] = useState<BusinessData | null>(() => {
+    const saved = localStorage.getItem("selected_business");
+    return saved ? JSON.parse(saved) : null;
+  });
+
+  const setSelectedBiz = (biz: BusinessData | null) => {
+    setSelectedBizState(biz);
+    if (biz) {
+      localStorage.setItem("selected_business", JSON.stringify(biz));
+    } else {
+      localStorage.removeItem("selected_business");
+    }
+  };
 
   useEffect(() => {
     const userId = getUserId();
