@@ -1,46 +1,38 @@
+<<<<<<< HEAD
 import { useState } from "react";
 import "./Navbar.css";
 import brandIcon from "../../assets/logo-tinka.webp";
 
 export type AppView = "dashboard" | "sales" | "calculator" | "chatbot";
+=======
+import { useState } from "react"
+import { Link, useLocation } from "react-router-dom"
+import "./Navbar.css"
+import brandIcon from "../../assets/icon.webp"
+>>>>>>> 2b10a098dbc1962d7e18689135ee38a2425ad5a5
 
 const navigation = [
-  {
-    id: "dashboard",
-    label: "Dashboard",
-  },
-  {
-    id: "sales",
-    label: "Registro ventas",
-  },
-  {
-    id: "calculator",
-    label: "Calculadora IA",
-  },
-  {
-    id: "chatbot",
-    label: "Chatbot",
-  },
-] as const satisfies Array<{
-  id: AppView;
-  label: string;
-}>;
+  { id: "dashboard", label: "Dashboard", path: "/" },
+  { id: "business", label: "Mis negocios", path: "/business" },
+  { id: "calculator", label: "Calculadora IA", path: "/calculator" },
+  { id: "chatbot", label: "Chatbot", path: "/chatbot" },
+] as const
+
+export type AppView = "dashboard" | "business" | "calculator" | "chatbot"
 
 interface NavbarProps {
-  activeView: AppView;
-  onChangeView: (view: AppView) => void;
-  user?: { name: string; email: string; role: string } | null;
-  onLogout?: () => void;
+  user?: { name: string; email: string; role: string } | null
+  onLogout?: () => void
 }
 
-export function Navbar({ activeView, onChangeView, user, onLogout }: NavbarProps) {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+export function Navbar({ user, onLogout }: NavbarProps) {
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
+  const location = useLocation()
 
-  const handleChangeView = (view: AppView) => {
-    onChangeView(view);
-    setIsMenuOpen(false);
-  };
+  const handleNavClick = () => {
+    setIsMenuOpen(false)
+  }
 
   const initials = user?.name
     ? user.name
@@ -49,7 +41,7 @@ export function Navbar({ activeView, onChangeView, user, onLogout }: NavbarProps
         .map((w) => w[0])
         .join("")
         .toUpperCase()
-    : "?";
+    : "?"
 
   return (
     <header className="navbar">
@@ -84,21 +76,22 @@ export function Navbar({ activeView, onChangeView, user, onLogout }: NavbarProps
         aria-label="Navegación principal"
       >
         {navigation.map((item) => (
-          <button
+          <Link
             key={item.id}
-            type="button"
+            to={item.path}
             className={
-              item.id === activeView ? "navbar__tab is-active" : "navbar__tab"
+              location.pathname === item.path
+                ? "navbar__tab is-active"
+                : "navbar__tab"
             }
-            onClick={() => handleChangeView(item.id)}
-            aria-current={item.id === activeView ? "page" : undefined}
+            onClick={handleNavClick}
+            aria-current={location.pathname === item.path ? "page" : undefined}
           >
             <span>{item.label}</span>
-          </button>
+          </Link>
         ))}
       </nav>
 
-      {/* ─── User Menu ─── */}
       {user && (
         <div className="navbar__user-area">
           <button
@@ -141,11 +134,20 @@ export function Navbar({ activeView, onChangeView, user, onLogout }: NavbarProps
                   type="button"
                   className="navbar__dropdown-item navbar__dropdown-item--danger"
                   onClick={() => {
-                    setIsUserMenuOpen(false);
-                    onLogout?.();
+                    setIsUserMenuOpen(false)
+                    onLogout?.()
                   }}
                 >
-                  <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
                     <path d="M7 17H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3" />
                     <polyline points="11 15 15 10 11 5" />
                     <line x1="15" y1="10" x2="7" y2="10" />
@@ -158,5 +160,5 @@ export function Navbar({ activeView, onChangeView, user, onLogout }: NavbarProps
         </div>
       )}
     </header>
-  );
+  )
 }

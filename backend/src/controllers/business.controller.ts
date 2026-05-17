@@ -66,7 +66,6 @@ export async function getBusinessesByUser(
     if (isNaN(userId)) {
       throw new AppError("userId inválido", 400);
     }
-
     const businesses = await businessService.getBusinessesByUserId(userId);
     return res.status(200).json(serializeBigInt(businesses));
   } catch (error) {
