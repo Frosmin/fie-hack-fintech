@@ -111,7 +111,6 @@ export function Navbar({ user, onLogout }: NavbarProps) {
         />
         <div>
           <span className="navbar__eyebrow">Comunidad Tinka</span>
-          <strong>Tu registro de ventas, claro y rapido</strong>
         </div>
       </div>
 
