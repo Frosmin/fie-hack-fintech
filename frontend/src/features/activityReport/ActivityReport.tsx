@@ -83,13 +83,6 @@ function formatShortDate(dateStr: string) {
   });
 }
 
-function formatMonthDay(dateStr: string) {
-  return new Date(dateStr).toLocaleDateString("es-BO", {
-    day: "2-digit",
-    month: "short",
-  });
-}
-
 /** Group transactions by date label for bar chart */
 function groupByDate(txs: Transaction[]) {
   const map = new Map<string, { income: number; expense: number; label: string }>();
