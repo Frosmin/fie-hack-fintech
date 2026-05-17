@@ -69,7 +69,7 @@ model BankTransaction {
   type          TransactionType
   description   String?
   date          DateTime         @default(now())
-  status        TransactionStatus @default(PENDING)
+  status        TransactionStatus @default(COMPLETED)
   bankName      String?
   accountNumber String?
   createdAt     DateTime         @default(now())
