@@ -237,6 +237,9 @@ importers:
       pg:
         specifier: ^8.16.0
         version: 8.20.0
+      zod:
+        specifier: ^4.4.3
+        version: 4.4.3
     devDependencies:
       '@types/bcryptjs':
         specifier: ^2.4.6
@@ -1210,6 +1213,9 @@ packages:
   safe-buffer@5.1.2:
     resolution: {integrity: sha512-Gd2UZBJDkXlY7GbJxfsE8/nvKkUEU1G38c1siN6QP6a9PT9MmHB8GnpscSmMJSoF8LOIrt8ud/wPtojys4G6+g==}
 
+  safe-buffer@5.2.1:
+    resolution: {integrity: sha512-rp3So07KcdmmKbGvgaNxQSJr7bGVSVk5S9Eq1F+ppbRo70+YeaDxkw5Dd8NPN+GD6bjnYm2VuPuCXmpuYvmCXQ==}
+
   safer-buffer@2.1.2:
     resolution: {integrity: sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg==}
 
@@ -1332,6 +1338,9 @@ packages:
 
   zeptomatch@2.1.0:
     resolution: {integrity: sha512-KiGErG2J0G82LSpniV0CtIzjlJ10E04j02VOudJsPyPwNZgGnRKQy7I1R7GMyg/QswnE4l7ohSGrQbQbjXPPDA==}
+
+  zod@4.4.3:
+    resolution: {integrity: sha512-ytENFjIJFl2UwYglde2jchW2Hwm4GJFLDiSXWdTrJQBIN9Fcyp7n4DhxJEiWNAJMV1/BqWfW/kkg71UDcHJyTQ==}
 
 snapshots:
 
@@ -1784,7 +1793,7 @@ snapshots:
 
   ecdsa-sig-formatter@1.0.11:
     dependencies:
-      safe-buffer: 5.1.2
+      safe-buffer: 5.2.1
 
   ee-first@1.1.1: {}
 
@@ -1997,12 +2006,12 @@ snapshots:
     dependencies:
       buffer-equal-constant-time: 1.0.1
       ecdsa-sig-formatter: 1.0.11
-      safe-buffer: 5.1.2
+      safe-buffer: 5.2.1
 
   jws@4.0.1:
     dependencies:
       jwa: 2.0.1
-      safe-buffer: 5.1.2
+      safe-buffer: 5.2.1
 
   lodash.includes@4.3.0: {}
 
@@ -2226,6 +2235,8 @@ snapshots:
 
   safe-buffer@5.1.2: {}
 
+  safe-buffer@5.2.1: {}
+
   safer-buffer@2.1.2: {}
 
   scheduler@0.27.0: {}
@@ -2345,3 +2356,5 @@ snapshots:
     dependencies:
       grammex: 3.1.12
       graphmatch: 1.1.1
+
+  zod@4.4.3: {}
