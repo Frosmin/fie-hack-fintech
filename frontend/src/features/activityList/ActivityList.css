@@ -1,0 +1,1051 @@
+/* ══════════════════════════════════════════════════════════
+   Activity List — Premium Redesign
+   ══════════════════════════════════════════════════════════ */
+
+.al {
+  display: grid;
+  gap: 20px;
+  animation: al-fadein 0.4s ease-out;
+}
+
+@keyframes al-fadein {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── Back button ── */
+.al__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 0.88rem;
+  cursor: pointer;
+  padding: 8px 4px;
+  transition:
+    color 0.2s,
+    gap 0.2s;
+  width: fit-content;
+}
+
+.al__back:hover {
+  color: var(--primary);
+  gap: 8px;
+}
+
+/* ══════════════════════════════════════════════════════════
+   Hero Card
+   ══════════════════════════════════════════════════════════ */
+.al__hero {
+  position: relative;
+  border-radius: var(--radius-xl);
+  background: #ffffff;
+  border: 1px solid rgba(219, 226, 240, 0.7);
+  box-shadow:
+    0 4px 24px rgba(43, 67, 130, 0.06),
+    0 1px 4px rgba(43, 67, 130, 0.04);
+  overflow: hidden;
+}
+
+.al__hero-glow {
+  position: absolute;
+  top: -60px;
+  right: -60px;
+  width: 240px;
+  height: 240px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(238, 0, 138, 0.08), transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.al__hero-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  padding: 28px 32px;
+}
+
+/* ── Left: Avatar + Info ── */
+.al__hero-left {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex: 1;
+  min-width: 0;
+}
+
+.al__hero-avatar {
+  width: 58px;
+  height: 58px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: #ffffff;
+  font-size: 1.5rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 16px rgba(238, 0, 138, 0.2);
+}
+
+.al__hero-avatar img {
+  width: 100%;
+  height: 100%;
+  border-radius: 16px;
+  object-fit: cover;
+}
+
+.al__hero-info {
+  min-width: 0;
+}
+
+.al__hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--primary);
+  margin-bottom: 4px;
+}
+
+.al__hero-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--primary);
+  animation: al-pulse 2s ease-in-out infinite;
+}
+
+@keyframes al-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.3);
+  }
+}
+
+.al__hero-name {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text-strong);
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+}
+
+.al__hero-desc {
+  color: var(--muted);
+  font-size: 0.88rem;
+  margin-top: 4px;
+  max-width: 40ch;
+  line-height: 1.4;
+}
+
+/* ── Right: Balance + Report ── */
+.al__hero-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-shrink: 0;
+}
+
+.al__report-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: 14px;
+  border: none;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.84rem;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: #fff;
+  transition: all 0.25s;
+  box-shadow: 0 4px 16px rgba(238, 0, 138, 0.18);
+  white-space: nowrap;
+  font-family: inherit;
+}
+
+.al__report-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(238, 0, 138, 0.28);
+  filter: brightness(1.05);
+}
+
+.al__hero-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.al__edit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: 14px;
+  border: 1.5px solid rgba(243, 156, 18, 0.3);
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.84rem;
+  background: rgba(243, 156, 18, 0.08);
+  color: #f39c12;
+  transition: all 0.25s;
+  white-space: nowrap;
+  font-family: inherit;
+}
+
+.al__edit-btn:hover {
+  background: rgba(243, 156, 18, 0.15);
+  border-color: #f39c12;
+}
+
+/* ── Balance Card ── */
+.al__balance-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  padding: 18px 24px;
+  border-radius: 18px;
+  background: linear-gradient(
+    135deg,
+    rgba(16, 185, 129, 0.04),
+    rgba(0, 91, 167, 0.04)
+  );
+  border: 1px solid rgba(16, 185, 129, 0.12);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.al__balance-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(16, 185, 129, 0.06),
+    transparent 70%
+  );
+  pointer-events: none;
+}
+
+.al__balance-card.is-negative {
+  background: linear-gradient(
+    135deg,
+    rgba(239, 68, 68, 0.04),
+    rgba(238, 0, 138, 0.04)
+  );
+  border-color: rgba(239, 68, 68, 0.12);
+}
+
+.al__balance-card.is-negative::before {
+  background: radial-gradient(circle, rgba(239, 68, 68, 0.06), transparent 70%);
+}
+
+.al__balance-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.al__balance-amount {
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--text-strong);
+  line-height: 1;
+}
+
+.al__balance-card.is-positive .al__balance-amount {
+  color: #059669;
+}
+
+.al__balance-card.is-negative .al__balance-amount {
+  color: #dc2626;
+}
+
+.al__balance-sync {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: #10b981;
+  animation: al-sync-fadein 0.6s ease-out 0.3s both;
+}
+
+@keyframes al-sync-fadein {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── Stats Row ── */
+.al__stats {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: stretch;
+  border-top: 1px solid rgba(219, 226, 240, 0.6);
+  background: linear-gradient(
+    180deg,
+    rgba(248, 249, 251, 0.6),
+    rgba(255, 255, 255, 0)
+  );
+}
+
+.al__stat {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 24px;
+}
+
+.al__stat-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.al__stat--income .al__stat-icon {
+  background: rgba(16, 185, 129, 0.1);
+  color: #059669;
+}
+
+.al__stat--expense .al__stat-icon {
+  background: rgba(239, 68, 68, 0.08);
+  color: #dc2626;
+}
+
+.al__stat--count .al__stat-icon {
+  background: rgba(79, 120, 240, 0.08);
+  color: var(--primary);
+}
+
+.al__stat-data {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.al__stat-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.al__stat-value {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--text-strong);
+  letter-spacing: -0.02em;
+}
+
+.al__stat-divider {
+  width: 1px;
+  background: rgba(219, 226, 240, 0.6);
+  align-self: stretch;
+  margin: 12px 0;
+}
+
+/* ══════════════════════════════════════════════════════════
+   Activities Section
+   ══════════════════════════════════════════════════════════ */
+.al__section {
+  display: grid;
+  gap: 16px;
+}
+
+.al__section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
+}
+
+.al__section-eyebrow {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--primary);
+  margin-bottom: 2px;
+}
+
+.al__section-title {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--text-strong);
+  letter-spacing: -0.02em;
+}
+
+.al__new-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 14px;
+  border: none;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.85rem;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #fff;
+  transition: all 0.25s;
+  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.2);
+  white-space: nowrap;
+  font-family: inherit;
+}
+
+.al__new-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.3);
+  filter: brightness(1.05);
+}
+
+/* ── Error ── */
+.al__error {
+  padding: 16px 20px;
+  border-radius: var(--radius-md);
+  background: rgba(239, 68, 68, 0.06);
+  color: #dc2626;
+  font-weight: 600;
+  font-size: 0.9rem;
+  border: 1px solid rgba(239, 68, 68, 0.12);
+}
+
+/* ── Loading ── */
+.al__loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 60px 20px;
+  color: var(--muted);
+}
+
+.al__loading-ring {
+  display: inline-block;
+  position: relative;
+  width: 40px;
+  height: 40px;
+}
+
+.al__loading-ring div {
+  box-sizing: border-box;
+  display: block;
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  margin: 4px;
+  border: 3px solid transparent;
+  border-radius: 50%;
+  animation: al-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+  border-top-color: var(--primary);
+}
+
+.al__loading-ring div:nth-child(1) {
+  animation-delay: -0.45s;
+}
+.al__loading-ring div:nth-child(2) {
+  animation-delay: -0.3s;
+}
+.al__loading-ring div:nth-child(3) {
+  animation-delay: -0.15s;
+}
+
+@keyframes al-ring {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* ── Empty State ── */
+.al__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.al__empty-visual {
+  margin-bottom: 8px;
+}
+
+.al__empty-circle {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: linear-gradient(
+    135deg,
+    rgba(238, 0, 138, 0.06),
+    rgba(0, 91, 167, 0.06)
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+}
+
+.al__empty h3 {
+  color: var(--text-strong);
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.al__empty p {
+  color: var(--muted);
+  font-size: 0.92rem;
+  max-width: 36ch;
+}
+
+/* ══════════════════════════════════════════════════════════
+   Activity Cards
+   ══════════════════════════════════════════════════════════ */
+.al__grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.al__card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 22px;
+  border-radius: 18px;
+  background: #ffffff;
+  border: 1px solid rgba(219, 226, 240, 0.6);
+  cursor: pointer;
+  transition: all 0.25s ease;
+  position: relative;
+}
+
+.al__card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 18px;
+  box-shadow: 0 8px 32px rgba(43, 67, 130, 0.12);
+  opacity: 0;
+  transition: opacity 0.25s;
+  pointer-events: none;
+}
+
+.al__card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(238, 0, 138, 0.15);
+}
+
+.al__card:hover::after {
+  opacity: 1;
+}
+
+.al__card-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex: 1;
+  min-width: 0;
+}
+
+.al__card-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  font-weight: 800;
+  flex-shrink: 0;
+  text-transform: uppercase;
+  transition: transform 0.2s;
+}
+
+.al__card:hover .al__card-icon {
+  transform: scale(1.05);
+}
+
+.al__card-icon.is-positive {
+  background: linear-gradient(
+    135deg,
+    rgba(16, 185, 129, 0.1),
+    rgba(5, 150, 105, 0.06)
+  );
+  color: #059669;
+  border: 1px solid rgba(16, 185, 129, 0.15);
+}
+
+.al__card-icon.is-negative {
+  background: linear-gradient(
+    135deg,
+    rgba(239, 68, 68, 0.08),
+    rgba(238, 0, 138, 0.06)
+  );
+  color: #dc2626;
+  border: 1px solid rgba(239, 68, 68, 0.12);
+}
+
+.al__card-info {
+  min-width: 0;
+}
+
+.al__card-name {
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: var(--text-strong);
+  margin-bottom: 4px;
+}
+
+.al__card-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.al__card-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  background: #f0f2f8;
+  color: #6b7a9e;
+  letter-spacing: 0.02em;
+}
+
+.al__card-status.is-active {
+  background: rgba(16, 185, 129, 0.1);
+  color: #059669;
+}
+
+.al__card-desc {
+  color: var(--muted);
+  font-size: 0.82rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 28ch;
+}
+
+/* ── Card Right: Money ── */
+.al__card-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  flex-shrink: 0;
+  padding-left: 12px;
+}
+
+.al__card-money-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.al__card-money {
+  font-size: 1.1rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.al__card-money.is-positive {
+  color: #059669;
+}
+
+.al__card-money.is-negative {
+  color: #dc2626;
+}
+
+/* ── Card Arrow ── */
+.al__card-arrow {
+  color: var(--muted);
+  flex-shrink: 0;
+  transition:
+    transform 0.25s,
+    color 0.25s;
+  opacity: 0.5;
+}
+
+.al__card:hover .al__card-arrow {
+  transform: translateX(4px);
+  color: var(--primary);
+  opacity: 1;
+}
+
+/* ══════════════════════════════════════════════════════════
+   Modal
+   ══════════════════════════════════════════════════════════ */
+.al__overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 30, 60, 0.45);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  animation: al-overlay-in 0.2s ease-out;
+}
+
+@keyframes al-overlay-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.al__modal {
+  background: #ffffff;
+  border-radius: 24px;
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow:
+    0 24px 80px rgba(43, 67, 130, 0.18),
+    0 8px 24px rgba(43, 67, 130, 0.06);
+  animation: al-modal-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes al-modal-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.al__modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 28px;
+  border-bottom: 1px solid rgba(219, 226, 240, 0.6);
+}
+
+.al__modal-header-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.al__modal-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.al__modal-header h3 {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--text-strong);
+}
+
+.al__modal-subtitle {
+  font-size: 0.82rem;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.al__modal-close {
+  background: none;
+  border: none;
+  padding: 6px;
+  cursor: pointer;
+  color: var(--muted);
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.al__modal-close:hover {
+  background: rgba(239, 68, 68, 0.06);
+  color: #dc2626;
+}
+
+.al__modal-form {
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.al__form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.al__form-group label {
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: var(--text-strong);
+}
+
+.al__form-group input,
+.al__form-group textarea {
+  padding: 11px 16px;
+  border: 1.5px solid rgba(219, 226, 240, 0.8);
+  border-radius: 12px;
+  font-size: 0.95rem;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+  background: #fafbfd;
+}
+
+.al__form-group input:focus,
+.al__form-group textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(238, 0, 138, 0.1);
+  background: #ffffff;
+}
+
+.al__modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-center;
+  padding-top: 8px;
+}
+
+.al__btn {
+  padding: 11px 22px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+  font-family: inherit;
+}
+
+.al__btn--cancel {
+  background: rgba(219, 226, 240, 0.4);
+  color: var(--text);
+}
+
+.al__btn--cancel:hover {
+  background: rgba(219, 226, 240, 0.7);
+}
+
+.al__btn--primary {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.2);
+}
+
+.al__btn--primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
+  filter: brightness(1.05);
+}
+
+.al__btn--primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  filter: none;
+}
+
+.al__btn--danger {
+  background: rgba(214, 45, 78, 0.1);
+  color: #d62d4e;
+  border: 1.5px solid rgba(214, 45, 78, 0.3);
+}
+
+.al__btn--danger:hover {
+  background: rgba(214, 45, 78, 0.2);
+  border-color: #d62d4e;
+}
+
+.al__modal-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.al__modal-actions-right {
+  display: flex;
+  gap: 10px;
+}
+
+.al__modal-actions--center {
+  justify-content: center;
+  gap: 12px;
+}
+
+.al__modal--confirm .al__modal-body {
+  padding: 16px 0;
+}
+
+.al__warning {
+  color: #d62d4e;
+  font-size: 0.85rem;
+  margin-top: 8px;
+  background: rgba(214, 45, 78, 0.06);
+  padding: 10px 14px;
+  border-radius: 8px;
+  border-left: 3px solid #d62d4e;
+}
+
+/* ══════════════════════════════════════════════════════════
+   Responsive
+   ══════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .al__hero-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+    padding: 22px 20px;
+  }
+
+  .al__hero-right {
+    width: 100%;
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .al__balance-card {
+    align-items: flex-start;
+  }
+
+  .al__report-btn {
+    align-self: flex-start;
+  }
+
+  .al__stats {
+    flex-direction: column;
+  }
+
+  .al__stat {
+    padding: 14px 20px;
+  }
+
+  .al__stat-divider {
+    width: 100%;
+    height: 1px;
+    margin: 0;
+  }
+
+  .al__section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .al__card {
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 16px 18px;
+  }
+
+  .al__card-left {
+    width: 100%;
+  }
+
+  .al__card-right {
+    align-items: flex-start;
+    padding-left: 60px;
+  }
+
+  .al__card-arrow {
+    position: absolute;
+    right: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .al__card:hover .al__card-arrow {
+    transform: translateY(-50%) translateX(4px);
+  }
+}
+
+@media (max-width: 480px) {
+  .al__hero-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 13px;
+    font-size: 1.2rem;
+  }
+
+  .al__hero-name {
+    font-size: 1.25rem;
+  }
+
+  .al__balance-amount {
+    font-size: 1.3rem;
+  }
+
+  .al__card-desc {
+    display: none;
+  }
+}

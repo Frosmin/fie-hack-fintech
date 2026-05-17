@@ -1,103 +1,335 @@
+import { useEffect, useRef, useState } from "react";
+import type { FormEvent } from "react";
 import "./Chatbot.css";
 
+const API_URL = "http://localhost:3000/api/chatbot/message";
+
+type ChatRole = "user" | "assistant";
+
+interface ChatMessage {
+  id: string;
+  role: ChatRole;
+  content: string;
+}
+
 const suggestions = [
-  "¿Cómo valido mi idea en 7 días?",
-  "Hazme un plan de ventas inicial.",
-  "¿Qué debo medir en mi primer mes?",
+  "Que negocio me esta generando mas ingresos?",
+  "Que actividad tiene mejor saldo y por que?",
+  "Que productos deberia revisar por precio o margen?",
+  "Resume mis ventas y transacciones recientes.",
 ];
 
-const assistantTips = [
-  "Define una propuesta de valor simple y concreta.",
-  "Habla con 5 usuarios antes de invertir más.",
-  "Mide leads, conversión y ticket promedio desde el día 1.",
+const initialMessages: ChatMessage[] = [
+  {
+    id: "welcome",
+    role: "assistant",
+    content:
+      "¡Hola! Soy tu asistente inteligente. Puedo ayudarte a analizar tus negocios, actividades, productos, ventas y transacciones con los datos que ya registraste. ¿En qué te puedo ayudar hoy?",
+  },
 ];
+
+function createMessage(role: ChatRole, content: string): ChatMessage {
+  return {
+    id: `${role}-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+    role,
+    content,
+  };
+}
+
+/* ── Inline SVG icons ── */
+
+function SparklesIcon({ size = 22 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 3l1.912 5.813a2 2 0 0 0 1.275 1.275L21 12l-5.813 1.912a2 2 0 0 0-1.275 1.275L12 21l-1.912-5.813a2 2 0 0 0-1.275-1.275L3 12l5.813-1.912a2 2 0 0 0 1.275-1.275L12 3z" />
+    </svg>
+  );
+}
+
+function SendIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M22 2L11 13" />
+      <path d="M22 2l-7 20-4-9-9-4 20-7z" />
+    </svg>
+  );
+}
+
+function LightbulbIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M9 18h6" />
+      <path d="M10 22h4" />
+      <path d="M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2z" />
+    </svg>
+  );
+}
+
+function ShieldIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+    </svg>
+  );
+}
+
+function EyeIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+      <circle cx="12" cy="12" r="3" />
+    </svg>
+  );
+}
+
+function ArrowIcon() {
+  return (
+    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M5 12h14" />
+      <path d="M12 5l7 7-7 7" />
+    </svg>
+  );
+}
+
+function BotAvatar() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 3l1.912 5.813a2 2 0 0 0 1.275 1.275L21 12l-5.813 1.912a2 2 0 0 0-1.275 1.275L12 21l-1.912-5.813a2 2 0 0 0-1.275-1.275L3 12l5.813-1.912a2 2 0 0 0 1.275-1.275L12 3z" />
+    </svg>
+  );
+}
 
 export function Chatbot() {
+  const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
+  const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+  }, [messages, loading]);
+
+  async function sendMessage(message: string) {
+    const trimmed = message.trim();
+    const token = localStorage.getItem("auth_token");
+
+    if (!trimmed || loading) return;
+
+    if (!token) {
+      setError("Tu sesion expiro. Vuelve a iniciar sesion.");
+      return;
+    }
+
+    const userMessage = createMessage("user", trimmed);
+    const recentHistory = messages
+      .filter((item) => item.id !== "welcome")
+      .slice(-6)
+      .map(({ role, content }) => ({ role, content }));
+
+    setMessages((prev) => [...prev, userMessage]);
+    setInput("");
+    setError("");
+    setLoading(true);
+
+    try {
+      const response = await fetch(API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          message: trimmed,
+          history: recentHistory,
+        }),
+      });
+
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(data.error || "No se pudo obtener respuesta del asistente");
+      }
+
+      setMessages((prev) => [
+        ...prev,
+        createMessage("assistant", data.reply || "No encontre una respuesta."),
+      ]);
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "No se pudo conectar con el asistente",
+      );
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    void sendMessage(input);
+  }
+
   return (
     <section className="chatbot">
-      <div className="section-heading">
-        <div>
-          <span className="section-heading__eyebrow">Asistente IA</span>
-          <h2>Chatbot para emprender</h2>
+      {/* ── Hero header ── */}
+      <div className="chat-hero">
+        <div className="chat-hero__top">
+          <div className="chat-hero__icon">
+            <SparklesIcon size={24} />
+          </div>
+          <div className="chat-hero__label">
+            <span className="chat-hero__badge">Inteligencia Artificial · Activa</span>
+            <h2>Tinka IA</h2>
+          </div>
         </div>
-        <p>
-          Un asistente guía con respuestas rápidas, sugerencias y foco en las
-          primeras decisiones de negocio.
+        <p className="chat-hero__desc">
+          Tu asistente inteligente para consultar negocios, actividades, productos, ventas y transacciones con respuestas basadas en tus registros.
         </p>
       </div>
 
+      {/* ── Main grid ── */}
       <div className="chatbot__grid">
-        <article className="panel chat-panel">
-          <div className="panel__header">
-            <div>
-              <span className="panel__eyebrow">Conversación</span>
-              <h3>Tu copiloto de negocio</h3>
+        {/* ── Chat panel ── */}
+        <article className="chat-panel">
+          <div className="chat-panel__header">
+            <div className="chat-panel__header-left">
+              <div className="chat-panel__avatar">
+                <BotAvatar />
+              </div>
+              <div className="chat-panel__title-group">
+                <span className="chat-panel__title">Asistente Tinka</span>
+                <span className="chat-panel__subtitle">Analisis inteligente de tu negocio</span>
+              </div>
             </div>
-            <span className="panel__badge">En línea</span>
+            <span className="chat-panel__model-badge">✦ Gemini 2.5</span>
           </div>
 
           <div
             className="chat-panel__messages"
-            aria-label="Mensajes del chatbot"
+            aria-label="Mensajes del asistente"
+            aria-live="polite"
           >
-            <div className="chat-message chat-message--assistant">
-              <strong>Asistente</strong>
-              <p>
-                Te ayudaré a priorizar tu idea, detectar oportunidades y crear
-                acciones concretas para avanzar.
-              </p>
-            </div>
+            {messages.map((message) => (
+              <div
+                key={message.id}
+                className={`chat-message chat-message--${message.role}`}
+              >
+                <div className="chat-message__avatar">
+                  {message.role === "assistant" ? (
+                    <BotAvatar />
+                  ) : (
+                    "Tu"
+                  )}
+                </div>
+                <div className="chat-message__bubble">
+                  <span className="chat-message__name">
+                    {message.role === "assistant" ? "Tinka IA" : "Tu"}
+                  </span>
+                  <p className="chat-message__text">{message.content}</p>
+                </div>
+              </div>
+            ))}
 
-            <div className="chat-message chat-message--user">
-              <strong>Emprendedor</strong>
-              <p>Quiero arrancar sin perder tiempo ni presupuesto.</p>
-            </div>
+            {loading && (
+              <div className="chat-message chat-message--assistant">
+                <div className="chat-message__avatar">
+                  <BotAvatar />
+                </div>
+                <div className="chat-message__bubble">
+                  <span className="chat-message__name">Tinka IA</span>
+                  <div className="typing-indicator" aria-label="Generando respuesta">
+                    <span />
+                    <span />
+                    <span />
+                  </div>
+                </div>
+              </div>
+            )}
 
-            <div className="chat-message chat-message--assistant">
-              <strong>Asistente</strong>
-              <p>
-                Perfecto. Empecemos con validación, oferta inicial y primer
-                canal de ventas.
-              </p>
-            </div>
+            <div ref={messagesEndRef} />
           </div>
 
-          <form className="chat-panel__composer">
-            <input
-              type="text"
-              placeholder="Escribe tu duda o meta de negocio"
-            />
-            <button type="button" className="primary-action">
-              Enviar
+          {error && (
+            <div className="chat-panel__error" role="alert">
+              ⚠ {error}
+            </div>
+          )}
+
+          <form className="chat-panel__composer" onSubmit={handleSubmit}>
+            <div className="chat-panel__input-wrap">
+              <input
+                type="text"
+                value={input}
+                onChange={(event) => setInput(event.target.value)}
+                placeholder="Escribe tu pregunta sobre negocios, ventas o productos..."
+                disabled={loading}
+                maxLength={1000}
+              />
+            </div>
+            <button
+              type="submit"
+              className="chat-panel__send-btn"
+              disabled={loading || input.trim().length === 0}
+            >
+              <SendIcon />
+              {loading ? "Analizando..." : "Enviar"}
             </button>
           </form>
         </article>
 
-        <article className="panel chat-panel__side">
-          <div className="panel__header">
-            <div>
-              <span className="panel__eyebrow">Sugerencias</span>
-              <h3>Prompts rápidos</h3>
+        {/* ── Sidebar ── */}
+        <aside className="chat-sidebar">
+          {/* Suggestions */}
+          <div className="suggestion-card">
+            <div className="suggestion-card__header">
+              <div className="suggestion-card__header-icon">
+                <LightbulbIcon />
+              </div>
+              <span className="suggestion-card__title">Preguntas sugeridas</span>
+            </div>
+            <div className="suggestion-list">
+              {suggestions.map((item) => (
+                <button
+                  key={item}
+                  type="button"
+                  className="suggestion-chip"
+                  onClick={() => setInput(item)}
+                  disabled={loading}
+                >
+                  <span>{item}</span>
+                  <span className="suggestion-chip__arrow">
+                    <ArrowIcon />
+                  </span>
+                </button>
+              ))}
             </div>
           </div>
 
-          <div className="suggestion-list">
-            {suggestions.map((item) => (
-              <button key={item} type="button" className="suggestion-chip">
-                {item}
-              </button>
-            ))}
-          </div>
-
+          {/* Tips */}
           <div className="assistant-tips">
-            {assistantTips.map((tip) => (
-              <article key={tip}>
-                <span>Recomendación</span>
-                <p>{tip}</p>
-              </article>
-            ))}
+            <article className="tip-card">
+              <span className="tip-card__label tip-card__label--context">
+                <ShieldIcon />
+                Contexto
+              </span>
+              <p>
+                Las respuestas usan un resumen de tus datos registrados, no
+                informacion de otros usuarios.
+              </p>
+            </article>
+            <article className="tip-card">
+              <span className="tip-card__label tip-card__label--scope">
+                <EyeIcon />
+                Alcance
+              </span>
+              <p>
+                El asistente solo consulta y analiza. No crea, edita ni elimina
+                registros.
+              </p>
+            </article>
           </div>
-        </article>
+        </aside>
       </div>
     </section>
   );

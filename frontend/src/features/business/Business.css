@@ -333,3 +333,17 @@
 .btn--secondary:hover {
   background: #e5ebf6;
 }
+
+/* ── Arrow indicator ── */
+.activity-card__arrow {
+  color: var(--muted);
+  font-size: 1.2rem;
+  flex-shrink: 0;
+  transition: transform 0.2s, color 0.2s;
+}
+
+.business-card:hover .activity-card__arrow {
+  transform: translateX(4px);
+  color: var(--primary);
+}
+

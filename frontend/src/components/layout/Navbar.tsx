@@ -1,14 +1,42 @@
-import { useState } from "react";
-import "./Navbar.css";
-import brandIcon from "../../assets/logo/logo-tinka.webp";
-import { Link, useLocation } from "react-router-dom";
+import { useState, useRef, useEffect } from "react"
+import { Link, useLocation } from "react-router-dom"
+import "./Navbar.css"
+import brandIcon from "../../assets/icon.webp"
 
 const navigation = [
-  { id: "dashboard", label: "Dashboard", path: "/" },
-  { id: "business", label: "Mis negocios", path: "/business" },
-  { id: "calculator", label: "Calculadora IA", path: "/calculator" },
-  { id: "chatbot", label: "Chatbot", path: "/chatbot" },
-] as const;
+  {
+    id: "business",
+    label: "Mis negocios",
+    path: "/business",
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M3 7l7-5 7 5v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z" />
+        <path d="M8 18V10h4v8" />
+      </svg>
+    ),
+  },
+  {
+    id: "calculator",
+    label: "Calculadora IA",
+    path: "/calculator",
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M10 2a8 8 0 1 0 0 16 8 8 0 0 0 0-16z" />
+        <path d="M10 6v4l3 2" />
+      </svg>
+    ),
+  },
+  {
+    id: "chatbot",
+    label: "Tinka IA",
+    path: "/chatbot",
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 3l1.912 5.813a2 2 0 0 0 1.275 1.275L21 12l-5.813 1.912a2 2 0 0 0-1.275 1.275L12 21l-1.912-5.813a2 2 0 0 0-1.275-1.275L3 12l5.813-1.912a2 2 0 0 0 1.275-1.275L12 3z" />
+      </svg>
+    ),
+  },
+] as const
 
 export type AppView = "dashboard" | "business" | "calculator" | "chatbot";
 
@@ -18,13 +46,38 @@ interface NavbarProps {
 }
 
 export function Navbar({ user, onLogout }: NavbarProps) {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-  const location = useLocation();
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
+  const location = useLocation()
+  const dropdownRef = useRef<HTMLDivElement>(null)
 
   const handleNavClick = () => {
-    setIsMenuOpen(false);
-  };
+    setIsMenuOpen(false)
+  }
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    if (!isUserMenuOpen) return
+    const handleClick = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setIsUserMenuOpen(false)
+      }
+    }
+    document.addEventListener("mousedown", handleClick)
+    return () => document.removeEventListener("mousedown", handleClick)
+  }, [isUserMenuOpen])
+
+  // Close dropdown on Escape
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setIsUserMenuOpen(false)
+        setIsMenuOpen(false)
+      }
+    }
+    document.addEventListener("keydown", handleKey)
+    return () => document.removeEventListener("keydown", handleKey)
+  }, [])
 
   const initials = user?.name
     ? user.name
@@ -45,13 +98,12 @@ export function Navbar({ user, onLogout }: NavbarProps) {
         />
         <div>
           <span className="navbar__eyebrow">Comunidad Tinka</span>
-          <strong>Tu registro de ventas, claro y rapido</strong>
         </div>
       </div>
 
       <button
         type="button"
-        className="navbar__toggle"
+        className={`navbar__toggle${isMenuOpen ? " is-open" : ""}`}
         aria-label="Abrir menu"
         aria-expanded={isMenuOpen}
         aria-controls="navbar-menu"
@@ -85,7 +137,7 @@ export function Navbar({ user, onLogout }: NavbarProps) {
       </nav>
 
       {user && (
-        <div className="navbar__user-area">
+        <div className="navbar__user-area" ref={dropdownRef}>
           <button
             type="button"
             className="navbar__avatar-btn"

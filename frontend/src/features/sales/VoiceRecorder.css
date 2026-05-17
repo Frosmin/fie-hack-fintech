@@ -1,0 +1,134 @@
+.voice-recorder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem 1rem;
+}
+
+.voice-recorder__mic {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+}
+
+.voice-recorder__mic.listening {
+  background: var(--color-primary-light, #e0f2fe);
+  border-color: var(--color-primary, #3b82f6);
+  animation: pulse 1.5s infinite;
+}
+
+.voice-recorder__mic.processing {
+  background: #fef3c7;
+  border-color: #f59e0b;
+}
+
+.voice-recorder__mic.success {
+  background: #dcfce7;
+  border-color: #22c55e;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 15px rgba(59, 130, 246, 0);
+  }
+}
+
+.mic-button {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: var(--color-text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mic-button svg {
+  width: 28px;
+  height: 28px;
+}
+
+.mic-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.voice-recorder__status {
+  text-align: center;
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+}
+
+.voice-recorder__status .listening {
+  color: var(--color-primary, #3b82f6);
+  font-style: italic;
+}
+
+.voice-recorder__status .processing {
+  color: #f59e0b;
+}
+
+.voice-recorder__status .success {
+  color: #22c55e;
+}
+
+.voice-recorder__status .error {
+  color: #ef4444;
+}
+
+.voice-recorder__actions {
+  display: flex;
+  gap: 0.75rem;
+  width: 100%;
+  justify-content: center;
+}
+
+.voice-recorder__actions button {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+}
+
+.voice-recorder__hints {
+  margin-top: 0.5rem;
+  padding: 0.75rem;
+  background: var(--color-surface);
+  border-radius: 8px;
+  width: 100%;
+  text-align: left;
+}
+
+.voice-recorder__hints p {
+  font-size: 0.8rem;
+  color: var(--color-text-light);
+  margin-bottom: 0.25rem;
+}
+
+.voice-recorder__hints ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--color-text-light);
+}
+
+.voice-recorder__hints li {
+  padding: 0.2rem 0;
+}

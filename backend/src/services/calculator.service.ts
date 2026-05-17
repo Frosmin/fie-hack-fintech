@@ -96,8 +96,11 @@ function computeCostBreakdown(input: BudgetInput): CostBreakdown {
   const marginPercentage =
     input.sellingPrice > 0 ? (marginPerUnit / input.sellingPrice) * 100 : 0;
   const monthlyVariableCosts =
-    totalUnitCost * input.estimatedMonthlySales;
-  const monthlyTotalCosts = input.fixedCosts + monthlyVariableCosts;
+    input.variableCostPerUnit * input.estimatedMonthlySales;
+  const monthlyProductionCosts =
+    input.unitCost * input.estimatedMonthlySales;
+  const monthlyTotalCosts =
+    input.fixedCosts + monthlyProductionCosts + monthlyVariableCosts;
   const monthlyRevenue = input.sellingPrice * input.estimatedMonthlySales;
   const monthlyProfit = monthlyRevenue - monthlyTotalCosts;
 

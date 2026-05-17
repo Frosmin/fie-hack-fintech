@@ -1,13 +1,15 @@
 import { useState, useEffect } from "react";
 import "./Business.css";
+import { ActivityList } from "../activityList/ActivityList";
 
-interface Business {
+interface BusinessData {
   id: number;
   name: string;
   description: string | null;
   logoUrl: string | null;
   address: string | null;
   phone: string | null;
+  BusinessMoney: string;
   isActive: boolean;
   userId: number;
   createdAt: string;
@@ -24,7 +26,7 @@ interface BusinessFormData {
 const API_URL = "http://localhost:3000/api/business";
 
 export function Business() {
-  const [businesses, setBusinesses] = useState<Business[]>([]);
+  const [businesses, setBusinesses] = useState<BusinessData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showModal, setShowModal] = useState(false);
@@ -35,6 +37,21 @@ export function Business() {
     phone: "",
   });
   const [submitting, setSubmitting] = useState(false);
+
+  // Activity list state
+  const [selectedBiz, setSelectedBizState] = useState<BusinessData | null>(() => {
+    const saved = localStorage.getItem("selected_business");
+    return saved ? JSON.parse(saved) : null;
+  });
+
+  const setSelectedBiz = (biz: BusinessData | null) => {
+    setSelectedBizState(biz);
+    if (biz) {
+      localStorage.setItem("selected_business", JSON.stringify(biz));
+    } else {
+      localStorage.removeItem("selected_business");
+    }
+  };
 
   useEffect(() => {
     const userId = getUserId();
@@ -123,6 +140,16 @@ export function Business() {
     );
   }
 
+  // If a business is selected, show its activities via ActivityList
+  if (selectedBiz) {
+    return (
+      <ActivityList
+        business={selectedBiz}
+        onBack={() => setSelectedBiz(null)}
+      />
+    );
+  }
+
   return (
     <section className="business">
       <div className="section-heading">
@@ -146,7 +173,12 @@ export function Business() {
       ) : (
         <div className="business__grid">
           {businesses.map((biz) => (
-            <article key={biz.id} className="business-card">
+            <article
+              key={biz.id}
+              className="business-card"
+              onClick={() => setSelectedBiz(biz)}
+              style={{ cursor: "pointer" }}
+            >
               <div className="business-card__header">
                 {biz.logoUrl ? (
                   <img
@@ -183,6 +215,7 @@ export function Business() {
                   </div>
                 )}
               </div>
+              <div className="activity-card__arrow">→</div>
             </article>
           ))}
         </div>

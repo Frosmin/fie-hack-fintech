@@ -8,6 +8,8 @@ import productRoutes from "./product.routes.js";
 import paymentMethodRoutes from "./paymentMethod.routes.js";
 import saleRoutes from "./sale.routes.js";
 import saleItemRoutes from "./saleItem.routes.js";
+import transactionRoutes from "./transaction.routes.js";
+import chatbotRoutes from "./chatbot.routes.js";
 import errorHandler from "../middlewares/error.middleware.js";
 
 const router: Router = Router();
@@ -25,6 +27,8 @@ router.use("/products", productRoutes);
 router.use("/payment-methods", paymentMethodRoutes);
 router.use("/sales", saleRoutes);
 router.use("/sale-items", saleItemRoutes);
+router.use("/transactions", transactionRoutes);
+router.use("/chatbot", chatbotRoutes);
 router.use(errorHandler);
 
 export default router;
