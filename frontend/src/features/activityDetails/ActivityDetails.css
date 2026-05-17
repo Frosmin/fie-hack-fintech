@@ -41,8 +41,8 @@
 .ad__hero-date { font-size:.78rem; color:var(--muted); }
 
 /* Report button */
-.ad__report-btn { display:inline-flex; align-items:center; gap:8px; padding:10px 18px; border-radius:12px; border:none; cursor:pointer; font-weight:700; font-size:.84rem; background:linear-gradient(135deg,var(--primary),var(--secondary)); color:#fff; transition:all .25s; box-shadow:0 4px 16px rgba(238,0,138,.18); white-space:nowrap; }
-.ad__report-btn:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(238,0,138,.28); filter:brightness(1.05); }
+.ad__report-btn { display:inline-flex; align-items:center; gap:8px; padding:10px 18px; border-radius:12px; border:none; cursor:pointer; font-weight:700; font-size:.84rem; background:#c91d63; color:#fff; transition:all .25s; box-shadow:0 4px 16px rgba(201,29,99,.18); white-space:nowrap; }
+.ad__report-btn:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(201,29,99,.28); filter:brightness(1.05); }
 .ad__report-btn:active { transform:translateY(0); }
 .ad__report-btn svg:last-child { transition:transform .2s; }
 .ad__report-btn:hover svg:last-child { transform:translateX(3px); }

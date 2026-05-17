@@ -348,7 +348,7 @@
   padding: 15px 24px;
   border: none;
   border-radius: 14px;
-  background: linear-gradient(135deg, #ee008a 0%, #b21f66 100%);
+  background: #c91d63;
   color: #ffffff;
   font-size: 1rem;
   font-weight: 700;
@@ -375,13 +375,13 @@
 .auth-submit:hover:not(:disabled) {
   transform: translateY(-1px);
   box-shadow:
-    0 8px 24px rgba(238, 0, 138, 0.35),
-    0 2px 8px rgba(238, 0, 138, 0.2);
+    0 8px 24px rgba(201, 29, 99, 0.35),
+    0 2px 8px rgba(201, 29, 99, 0.2);
 }
 
 .auth-submit:active:not(:disabled) {
   transform: translateY(0);
-  box-shadow: 0 4px 12px rgba(238, 0, 138, 0.2);
+  box-shadow: 0 4px 12px rgba(201, 29, 99, 0.2);
 }
 
 .auth-submit:disabled {
