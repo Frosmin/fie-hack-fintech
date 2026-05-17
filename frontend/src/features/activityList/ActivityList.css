@@ -97,6 +97,30 @@
   color: var(--text-strong);
 }
 
+/* Report button */
+.biz-report-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.84rem;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: #fff;
+  transition: all 0.25s;
+  box-shadow: 0 4px 16px rgba(238, 0, 138, 0.18);
+  white-space: nowrap;
+  font-family: inherit;
+}
+.biz-report-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(238, 0, 138, 0.28);
+  filter: brightness(1.05);
+}
+
 /* ── Activity card extras ── */
 .activity-card {
   position: relative;

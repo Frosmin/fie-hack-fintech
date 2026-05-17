@@ -10,6 +10,7 @@ import { Chatbot } from './features/chatbot/Chatbot'
 import { AuthPage } from './features/auth/AuthPage'
 import { ActivityDetails } from './features/activityDetails/ActivityDetails'
 import { ActivityReport } from './features/activityReport/ActivityReport'
+import { BusinessReport } from './features/businessReport/BusinessReport'
 
 const router = createBrowserRouter([
   {
@@ -23,6 +24,7 @@ const router = createBrowserRouter([
       { index: true, element: <Dashboard /> },
       { path: 'dashboard', element: <Dashboard /> },
       { path: 'business', element: <Business /> },
+      { path: 'business/:bizId/report', element: <BusinessReport /> },
       { path: 'calculator', element: <Calculator /> },
       { path: 'chatbot', element: <Chatbot /> },
       { path: 'activity/:id', element: <ActivityDetails /> },
