@@ -176,6 +176,8 @@ export function ActivityDetails() {
       const newTx = await res.json();
       setTransactions((prev) => [newTx, ...prev]);
       setShowForm(false);
+      // Re-fetch activity to get updated balance
+      await fetchActivity();
       setSuccessMessage(
         formMode === "pay"
           ? "¡Pago registrado exitosamente!"

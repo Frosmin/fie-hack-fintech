@@ -1,4 +1,5 @@
 import * as transactionRepository from "../repositories/transaction.repository.js";
+import prisma from "../config/prisma.js";
 import AppError from "../errors/appError.js";
 
 interface CreateTransactionInput {
@@ -21,8 +22,23 @@ interface UpdateTransactionInput {
   accountNumber?: string | null;
 }
 
+// DEPOSIT and REFUND add to balance, everything else subtracts
+const INCOME_TYPES = new Set(["DEPOSIT", "REFUND"]);
+
 export async function createTransaction(data: CreateTransactionInput) {
-  return transactionRepository.create(data);
+  const isIncome = INCOME_TYPES.has(data.type);
+  const delta = isIncome ? data.amount : -data.amount;
+
+  // Atomically create transaction + update activity balance
+  const [transaction] = await prisma.$transaction([
+    prisma.bankTransaction.create({ data }),
+    prisma.activity.update({
+      where: { id: data.activityId },
+      data: { activityMoney: { increment: delta } },
+    }),
+  ]);
+
+  return transaction;
 }
 
 export async function getTransactionById(id: bigint | number) {
