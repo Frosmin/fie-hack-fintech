@@ -477,7 +477,7 @@ export function ActivityDetails() {
               <div className="ad__qr-modal-info">
                 <h3>{activity.name}</h3>
                 <p>Escanea este código QR con tu app de BancoFie para realizar un pago</p>
-                <span className="ad__qr-modal-amount">Saldo: {formatMoney(balance)}</span>
+                {/* <span className="ad__qr-modal-amount">Saldo: {formatMoney(balance)}</span> */}
               </div>
             </div>
           </div>
