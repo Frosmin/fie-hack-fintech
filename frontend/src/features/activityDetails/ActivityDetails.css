@@ -25,6 +25,7 @@
 .ad__hero-desc { color:var(--muted); font-size:.88rem; line-height:1.4; }
 
 .ad__hero-balance-section { display:flex; flex-direction:column; gap:10px; position:relative; z-index:1; }
+.ad__hero-actions { display:flex; gap:10px; flex-wrap:wrap; }
 .ad__hero-balance { padding:18px 22px; border-radius:var(--radius-lg); background:linear-gradient(135deg,rgba(238,0,138,.04),rgba(0,91,167,.04)); border:1px solid rgba(238,0,138,.08); display:flex; flex-direction:column; }
 .ad__hero-balance-label { display:block; font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin-bottom:4px; }
 .ad__hero-balance-value { font-size:2rem; font-weight:800; letter-spacing:-.03em; }
@@ -40,11 +41,14 @@
 .ad__hero-date { font-size:.78rem; color:var(--muted); }
 
 /* Report button */
-.ad__report-btn { display:inline-flex; align-items:center; gap:8px; margin-top:12px; padding:10px 20px; border-radius:12px; border:none; cursor:pointer; font-weight:700; font-size:.86rem; background:linear-gradient(135deg,var(--primary),var(--secondary)); color:#fff; transition:all .25s; box-shadow:0 4px 16px rgba(238,0,138,.18); }
+.ad__report-btn { display:inline-flex; align-items:center; gap:8px; padding:10px 18px; border-radius:12px; border:none; cursor:pointer; font-weight:700; font-size:.84rem; background:linear-gradient(135deg,var(--primary),var(--secondary)); color:#fff; transition:all .25s; box-shadow:0 4px 16px rgba(238,0,138,.18); white-space:nowrap; }
 .ad__report-btn:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(238,0,138,.28); filter:brightness(1.05); }
 .ad__report-btn:active { transform:translateY(0); }
 .ad__report-btn svg:last-child { transition:transform .2s; }
 .ad__report-btn:hover svg:last-child { transform:translateX(3px); }
+
+.ad__edit-activity-btn { display:inline-flex; align-items:center; gap:8px; padding:10px 18px; border-radius:12px; border:1.5px solid rgba(243,156,18,.3); cursor:pointer; font-weight:700; font-size:.84rem; background:rgba(243,156,18,.08); color:#f39c12; transition:all .25s; white-space:nowrap; }
+.ad__edit-activity-btn:hover { background:rgba(243,156,18,.15); border-color:#f39c12; transform:translateY(-2px); }
 
 /* ── QR card ── */
 .ad__qr-card { border-radius:var(--radius-xl); background:#fff; border:1px solid #dbe2f0; padding:24px; display:flex; flex-direction:column; gap:16px; align-items:center; box-shadow:0 4px 24px rgba(43,67,130,.06); }
@@ -137,7 +141,7 @@
 .ad__qr-modal-amount { display:inline-block; margin-top:10px; padding:6px 14px; border-radius:20px; background:rgba(238,0,138,.06); color:var(--primary); font-weight:700; font-size:.88rem; }
 
 /* Form modal */
-.ad__form-modal { background:#fff; border-radius:var(--radius-xl); max-width:480px; width:100%; box-shadow:0 24px 80px rgba(43,67,130,.18); animation:adPop .3s ease; overflow:hidden; max-height:90vh; overflow-y:auto; }
+.ad__form-modal, .ad__activity-modal { background:#fff; border-radius:var(--radius-xl); max-width:480px; width:100%; box-shadow:0 24px 80px rgba(43,67,130,.18); animation:adPop .3s ease; overflow:hidden; max-height:90vh; overflow-y:auto; }
 .ad__form-header { display:flex; align-items:center; justify-content:space-between; padding:20px 24px; border-bottom:1px solid #e5ebf6; }
 .ad__form-header-left { display:flex; align-items:center; gap:12px; }
 .ad__form-mode-icon { width:40px; height:40px; border-radius:12px; display:flex; align-items:center; justify-content:center; }
