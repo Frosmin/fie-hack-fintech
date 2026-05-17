@@ -20,5 +20,24 @@ export const updateTransactionSchema = z.object({
   accountNumber: z.string().optional().nullable(),
 });
 
+export const batchTransactionSchema = z.object({
+  activityId: z.number().int().positive("El activityId es requerido"),
+  mode: z.enum(["charge", "pay"]),
+  transactions: z.array(
+    z.object({
+      nameCuate: z.string().min(1, "El nombre es requerido"),
+      amount: z.union([
+        z.number().positive("El monto debe ser positivo"),
+        z.string().transform((val) => parseFloat(val)).pipe(z.number().positive("El monto debe ser positivo"))
+      ]),
+      type: z.enum(["DEPOSIT", "WITHDRAWAL", "TRANSFER", "PAYMENT", "REFUND"]),
+      description: z.string().optional().nullable(),
+      bankName: z.string().optional().nullable(),
+      accountNumber: z.string().optional().nullable(),
+    })
+  ).min(1, "Al menos una transacción es requerida").max(500, "Máximo 500 transacciones permitidas"),
+});
+
 export type CreateTransactionInput = z.infer<typeof createTransactionSchema>;
 export type UpdateTransactionInput = z.infer<typeof updateTransactionSchema>;
+export type BatchTransactionInput = z.infer<typeof batchTransactionSchema>;
